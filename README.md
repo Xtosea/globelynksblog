@@ -9,7 +9,7 @@ The Studio connects to Sanity Content Lake, which gives you hosted content APIs 
 > [!NOTE]  
 > This starter uses the Next.js [Pages Router](https://nextjs.org/docs/pages). [An App Router example is also available.](https://github.com/vercel/next.js/tree/canary/examples/cms-sanity#readme)
 
-## Features
+## Feature
 
 - A performant, static blog with editable posts, authors, and site settings
 - A native and customizable authoring environment, accessible on `yourblog.com/studio`
