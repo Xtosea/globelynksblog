@@ -1,22 +1,31 @@
-import { useRouter } from 'next/router'
-import { posts } from '../../data/posts'
+import { useRouter } from "next/router"
+import { posts } from "../../data/posts"
 
 export default function Post() {
-  const router = useRouter()
-  const { slug } = router.query
+  const { slug } = useRouter().query
+  const post = posts.find(p => p.slug === slug)
 
-  const post = posts.find((p) => p.slug === slug)
-
-  if (!post) return <p>Post not found!</p>
+  if (!post) return null
 
   return (
-    <main style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
-      <h1>{post.title}</h1>
-      <p style={{ fontSize: '0.85rem', color: '#555' }}>
-        {post.author} – {post.date}
-      </p>
-      <img src={post.coverImage} alt={post.title} style={{ maxWidth: '100%', marginTop: '1rem' }} />
-      <p style={{ marginTop: '1rem' }}>{post.content}</p>
+    <main className="min-h-screen bg-gray-50 px-6 py-10">
+      <article className="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow">
+        <h1 className="text-4xl font-bold">{post.title}</h1>
+
+        <p className="text-gray-500 text-sm mt-2">
+          {post.author} · {post.date}
+        </p>
+
+        <img
+          src={post.coverImage}
+          alt={post.title}
+          className="rounded-lg my-6"
+        />
+
+        <p className="text-lg text-gray-800 leading-relaxed">
+          {post.content}
+        </p>
+      </article>
     </main>
   )
-    }
+}
