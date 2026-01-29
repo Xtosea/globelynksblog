@@ -1,16 +1,10 @@
-import Link from "next/link"
-import { posts } from "../data/posts"
+import Link from "next/link";
+import { posts } from "../data/posts";
 
 export default function Home() {
   return (
     <main className="min-h-screen bg-gray-50 px-6 py-10">
       <div className="max-w-3xl mx-auto">
-
-        {/* --- Tailwind Test Box --- */}
-        <div className="bg-blue-500 text-white p-4 mb-8 rounded">
-          Tailwind is working!
-        </div>
-
         {/* --- Blog Header --- */}
         <h1 className="text-4xl font-bold mb-2">Globelynks Blog</h1>
         <p className="text-gray-600 mb-10">
@@ -19,8 +13,8 @@ export default function Home() {
 
         {/* --- Blog Posts --- */}
         <div className="space-y-8">
-          {posts.map(post => (
-            <div key={post.slug} className="bg-white p-6 rounded-xl shadow">
+          {posts.map((post) => (
+            <div key={post.slug} className="bg-white p-6 rounded-xl shadow-small">
               <h2 className="text-2xl font-semibold">
                 <Link href={`/posts/${post.slug}`} className="hover:underline">
                   {post.title}
@@ -31,13 +25,11 @@ export default function Home() {
                 {post.author} · {post.date}
               </p>
 
-              <p className="mt-4 text-gray-700">
-                {post.excerpt}
-              </p>
+              <p className="mt-4 text-gray-700">{post.excerpt}</p>
             </div>
           ))}
         </div>
       </div>
     </main>
-  )
+  );
 }
