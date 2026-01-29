@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { posts } from "../data/posts"
-import "../styles/globals.css"
+
 
 export default function Home() {
   return (
