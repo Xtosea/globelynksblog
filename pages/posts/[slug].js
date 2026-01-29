@@ -1,9 +1,20 @@
 import { MDXRemote } from "next-mdx-remote"
 import { serialize } from "next-mdx-remote/serialize"
-import { getPostBySlug } from "../../lib/posts"
+import { getPostBySlug, getAllPosts } from "../../lib/posts"
 import Navbar from "../../components/Navbar"
 import Footer from "../../components/Footer"
 import Head from "next/head"
+
+export async function getStaticPaths() {
+  const posts = getAllPosts()
+
+  return {
+    paths: posts.map(post => ({
+      params: { slug: post.slug },
+    })),
+    fallback: false,
+  }
+}
 
 export async function getStaticProps({ params }) {
   const { content, data } = getPostBySlug(params.slug)
@@ -14,7 +25,7 @@ export async function getStaticProps({ params }) {
       mdxSource,
       frontMatter: {
         ...data,
-        date: data.date.toString(), // ✅ FIXED
+        date: data.date.toString(), // ✅ JSON-safe
       },
     },
   }
