@@ -3,6 +3,7 @@ import { serialize } from "next-mdx-remote/serialize"
 import { getPostBySlug, getAllPosts } from "../../lib/posts"
 import Navbar from "../../components/Navbar"
 import Footer from "../../components/Footer"
+import { posts } from "../../data/posts"
 import Head from "next/head"
 
 export async function getStaticPaths() {
