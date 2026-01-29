@@ -1,6 +1,6 @@
 import { MDXRemote } from "next-mdx-remote"
 import { serialize } from "next-mdx-remote/serialize"
-import { getPostBySlug, getAllPosts } from "../../lib/posts"
+import { getPostBySlug } from "../../lib/posts"
 import Navbar from "../../components/Navbar"
 import Footer from "../../components/Footer"
 import Head from "next/head"
@@ -14,17 +14,10 @@ export async function getStaticProps({ params }) {
       mdxSource,
       frontMatter: {
         ...data,
-        date: data.date.toString(), // ✅ FIX
+        date: data.date.toString(), // ✅ FIXED
       },
     },
   }
-}
-
-export async function getStaticProps({ params }) {
-  const { content, data } = getPostBySlug(params.slug)
-  const mdxSource = await serialize(content)
-
-  return { props: { mdxSource, frontMatter: data } }
 }
 
 export default function Post({ mdxSource, frontMatter }) {
