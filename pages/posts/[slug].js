@@ -1,31 +1,48 @@
-import { useRouter } from "next/router"
-import { posts } from "../../data/posts"
+import { MDXRemote } from "next-mdx-remote"
+import { serialize } from "next-mdx-remote/serialize"
+import { getPostBySlug, getAllPosts } from "../../lib/posts"
+import Navbar from "../../components/Navbar"
+import Footer from "../../components/Footer"
+import Head from "next/head"
 
-export default function Post() {
-  const { slug } = useRouter().query
-  const post = posts.find(p => p.slug === slug)
+export async function getStaticPaths() {
+  const posts = getAllPosts()
+  return {
+    paths: posts.map(p => ({ params: { slug: p.slug } })),
+    fallback: false
+  }
+}
 
-  if (!post) return null
+export async function getStaticProps({ params }) {
+  const { content, data } = getPostBySlug(params.slug)
+  const mdxSource = await serialize(content)
 
+  return { props: { mdxSource, frontMatter: data } }
+}
+
+export default function Post({ mdxSource, frontMatter }) {
   return (
-    <main className="min-h-screen bg-gray-50 px-6 py-10">
-      <article className="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow">
-        <h1 className="text-4xl font-bold">{post.title}</h1>
+    <>
+      <Head>
+        <title>{frontMatter.title}</title>
+        <meta name="description" content={frontMatter.excerpt} />
+      </Head>
 
-        <p className="text-gray-500 text-sm mt-2">
-          {post.author} · {post.date}
+      <Navbar />
+
+      <article className="max-w-3xl mx-auto px-6 py-12">
+        <h1 className="text-4xl font-bold mb-4">{frontMatter.title}</h1>
+
+        <p className="text-gray-500 text-sm mb-8">
+          {frontMatter.author} · {frontMatter.date}
         </p>
 
-        <img
-          src={post.coverImage}
-          alt={post.title}
-          className="rounded-lg my-6"
-        />
-
-        <p className="text-lg text-gray-800 leading-relaxed">
-          {post.content}
-        </p>
+        <div className="prose prose-lg max-w-none">
+          <MDXRemote {...mdxSource} />
+        </div>
       </article>
-    </main>
+
+      <Footer />
+    </>
   )
 }
