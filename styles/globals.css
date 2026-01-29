@@ -1,37 +1,20 @@
-/* Import Tailwind layers */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* globals.css */
 
-/* Optional: CSS variables for runtime use */
+/* Optional: custom colors for your blog */
 :root {
-  --color-accent-1: #fafafa;
-  --color-accent-2: #eaeaea;
-  --color-accent-7: #333;
+  --color-accent1: #fafafa;
+  --color-accent2: #eaeaea;
+  --color-accent7: #333;
   --color-success: #0070f3;
   --color-cyan: #79ffe1;
-  --color-blue-500: #2276fc;
-  --color-yellow-100: #fef7da;
-
-  --tracking-tighter: -0.04em;
-  --leading-tight: 1.2;
-
-  --text-5xl: 2.5rem;
-  --text-6xl: 2.75rem;
-  --text-7xl: 4.5rem;
-  --text-8xl: 6.25rem;
-
-  --shadow-small: 0 5px 10px rgba(0, 0, 0, 0.12);
-  --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.12);
+  --color-blue500: #2276fc;
+  --color-yellow100: #fef7da;
 }
 
-/* Base layer override for border colors */
-@layer base {
-  *,
-  ::after,
-  ::before,
-  ::backdrop,
-  ::file-selector-button {
-    border-color: var(--color-gray-200, currentColor);
-  }
+/* Base styling for body */
+body {
+  font-family: system-ui, sans-serif;
+  background-color: var(--color-accent1);
+  margin: 0;
+  padding: 0;
 }
