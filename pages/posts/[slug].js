@@ -5,14 +5,18 @@ import Navbar from "../../components/Navbar"
 import Footer from "../../components/Footer"
 import Head from "next/head"
 
-export async function getStaticPaths() {
-  const posts = getAllPosts()
+export async function getStaticProps({ params }) {
+  const { content, data } = getPostBySlug(params.slug)
+  const mdxSource = await serialize(content)
 
   return {
-    paths: posts.map(post => ({
-      params: { slug: post.slug },
-    })),
-    fallback: false,
+    props: {
+      mdxSource,
+      frontMatter: {
+        ...data,
+        date: data.date ? new Date(data.date).toISOString() : null,
+      },
+    },
   }
 }
 
