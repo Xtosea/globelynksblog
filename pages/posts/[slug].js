@@ -1,6 +1,6 @@
 import { MDXRemote } from "next-mdx-remote"
 import { serialize } from "next-mdx-remote/serialize"
-import { getPostBySlug, getAllPosts } from "../lib/posts"
+import { getPostBySlug, getAllPosts } from "../../lib/posts"
 import Navbar from "../../components/Navbar"
 import Footer from "../../components/Footer"
 import Head from "next/head"
