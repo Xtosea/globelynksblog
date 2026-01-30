@@ -14,7 +14,7 @@ export default function Home() {
         {/* --- Blog Posts --- */}
         <div className="space-y-8">
           {posts.map((post) => (
-            <div key={post.slug} className="bg-white p-6 rounded-xl shadow-small">
+            <div key={post.slug} className="bg-white p-6 rounded-xl shadow">
               <h2 className="text-2xl font-semibold">
                 <Link href={`/posts/${post.slug}`} className="hover:underline">
                   {post.title}
