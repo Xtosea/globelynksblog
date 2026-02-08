@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { connectDB } from "../../../lib/mongodb";
-import Post from "../../../models/post";
+import post from "../../../models/post";
 
 export async function POST(req) {
   try {
