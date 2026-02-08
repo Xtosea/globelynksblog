@@ -16,48 +16,26 @@ export async function POST(req) {
       );
     }
 
-    // ✅ Verify JWT
-    try {
-      jwt.verify(token, process.env.JWT_SECRET);
-    } catch {
-      return NextResponse.json(
-        { message: "Invalid or expired token" },
-        { status: 401 }
-      );
-    }
+    // ✅ Verify token
+    jwt.verify(token, process.env.JWT_SECRET);
 
     // 📦 Parse request body
     const body = await req.json();
-    const { title, slug, excerpt, content, image, category, author } = body;
-
-    if (!title || !slug || !excerpt || !content) {
-      return NextResponse.json(
-        { message: "Title, slug, excerpt, and content are required" },
-        { status: 400 }
-      );
-    }
 
     // 🔌 Connect to MongoDB
     await connectDB();
 
-    // ✍️ Create post
-    const post = await Post.create({
-      title,
-      slug,
-      excerpt,
-      content,
-      image: image || "/og.png",
-      category,
-      author,
-      publishedAt: new Date()
-    });
+    // ✍️ Create new post
+    const post = await Post.create(body);
 
     return NextResponse.json(post, { status: 201 });
   } catch (err) {
-    console.error("Create post error:", err);
-    return NextResponse.json(
-      { message: "Server error" },
-      { status: 500 }
-    );
+    console.error(err);
+
+    // Distinguish unauthorized vs server errors
+    const status = err.name === "JsonWebTokenError" ? 401 : 500;
+    const message = status === 401 ? "Unauthorized" : "Server error";
+
+    return NextResponse.json({ message }, { status });
   }
 }
