@@ -1,5 +1,4 @@
-"use client";
-import { useState } from "react";
+import { useState } from "react"
 
 export default function Publisher() {
   const [post, setPost] = useState({
@@ -9,13 +8,14 @@ export default function Publisher() {
     image: "",
     excerpt: "",
     content: ""
-  });
+  })
 
-  const [loading, setLoading] = useState(false);
+  const [token, setToken] = useState("") // store JWT from login
+  const [message, setMessage] = useState("")
 
   function handleChange(e) {
-    const { name, value } = e.target;
-    setPost(prev => ({ ...prev, [name]: value }));
+    const { name, value } = e.target
+    setPost(prev => ({ ...prev, [name]: value }))
   }
 
   function slugify(text) {
@@ -23,45 +23,40 @@ export default function Publisher() {
       .toLowerCase()
       .trim()
       .replace(/[^a-z0-9]+/g, "-")
-      .replace(/(^-|-$)/g, "");
+      .replace(/(^-|-$)/g, "")
   }
 
   async function handleSubmit(e) {
-    e.preventDefault();
+    e.preventDefault()
 
     // Basic validation
     if (!post.title || !post.excerpt || !post.content) {
-      alert("Title, excerpt and content are required");
-      return;
+      alert("Title, excerpt and content are required")
+      return
     }
 
-    setLoading(true);
+    if (!token) {
+      alert("You must be logged in first")
+      return
+    }
+
+    const slug = slugify(post.title)
 
     try {
-      const token = localStorage.getItem("token"); // must be logged in
-      if (!token) {
-        alert("You must be logged in as publisher/admin");
-        setLoading(false);
-        return;
-      }
-
-      const baseSlug = slugify(post.title);
       const res = await fetch("/api/posts/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
+          "Authorization": `Bearer ${token}`
         },
-        body: JSON.stringify({ ...post, slug: baseSlug })
-      });
+        body: JSON.stringify({ ...post, slug })
+      })
 
-      const data = await res.json();
+      const data = await res.json()
 
-      if (!res.ok) {
-        alert(data.message || "Error creating post");
-      } else {
-        alert("Post published successfully!");
-        // Reset form
+      if (res.ok) {
+        setMessage("Post published successfully!")
+        // reset form
         setPost({
           title: "",
           category: "breaking",
@@ -69,24 +64,75 @@ export default function Publisher() {
           image: "",
           excerpt: "",
           content: ""
-        });
+        })
+      } else {
+        setMessage(data.message || "Failed to publish")
+      }
+
+    } catch (err) {
+      console.error(err)
+      setMessage("Server error")
+    }
+  }
+
+  // Example login function (replace with your login form)
+  async function handleLogin(email, password) {
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password })
+      })
+
+      const data = await res.json()
+      if (res.ok) {
+        setToken(data.token)
+        alert("Logged in successfully!")
+      } else {
+        alert(data.message || "Login failed")
       }
     } catch (err) {
-      console.error(err);
-      alert("Server error");
-    } finally {
-      setLoading(false);
+      console.error(err)
+      alert("Server error")
     }
   }
 
   return (
     <main className="min-h-screen bg-gray-100 px-6 py-10">
       <div className="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow">
-
         <h1 className="text-3xl font-bold mb-6">Publisher Dashboard</h1>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        {/* Optional: Quick login form for testing */}
+        {!token && (
+          <div className="mb-6">
+            <h2 className="font-semibold mb-2">Admin Login</h2>
+            <input
+              type="email"
+              placeholder="Email"
+              id="loginEmail"
+              className="border p-2 rounded w-full mb-2"
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              id="loginPassword"
+              className="border p-2 rounded w-full mb-2"
+            />
+            <button
+              className="bg-green-600 text-white px-4 py-2 rounded"
+              onClick={() =>
+                handleLogin(
+                  document.getElementById("loginEmail").value,
+                  document.getElementById("loginPassword").value
+                )
+              }
+            >
+              Login
+            </button>
+          </div>
+        )}
 
+        <form onSubmit={handleSubmit} className="space-y-5">
           <input
             name="title"
             value={post.title}
@@ -94,7 +140,6 @@ export default function Publisher() {
             className="w-full border p-3 rounded"
             onChange={handleChange}
           />
-
           <select
             name="category"
             value={post.category}
@@ -107,7 +152,6 @@ export default function Publisher() {
             <option value="tech">Tech</option>
             <option value="sports">Sports</option>
           </select>
-
           <input
             name="author"
             value={post.author}
@@ -115,7 +159,6 @@ export default function Publisher() {
             className="w-full border p-3 rounded"
             onChange={handleChange}
           />
-
           <input
             name="image"
             value={post.image}
@@ -123,7 +166,6 @@ export default function Publisher() {
             className="w-full border p-3 rounded"
             onChange={handleChange}
           />
-
           <textarea
             name="excerpt"
             value={post.excerpt}
@@ -132,7 +174,6 @@ export default function Publisher() {
             className="w-full border p-3 rounded"
             onChange={handleChange}
           />
-
           <textarea
             name="content"
             value={post.content}
@@ -144,17 +185,14 @@ export default function Publisher() {
 
           <button
             type="submit"
-            disabled={loading}
-            className={`bg-blue-600 hover:bg-blue-700 transition text-white px-6 py-3 rounded font-semibold ${
-              loading ? "opacity-50 cursor-not-allowed" : ""
-            }`}
+            className="bg-blue-600 hover:bg-blue-700 transition text-white px-6 py-3 rounded font-semibold"
           >
-            {loading ? "Publishing..." : "Publish"}
+            Publish
           </button>
 
+          {message && <p className="mt-3 text-green-600">{message}</p>}
         </form>
-
       </div>
     </main>
-  );
+  )
 }
