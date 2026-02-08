@@ -1,24 +1,25 @@
-import jwt from "jsonwebtoken"
+// pages/api/auth/login.js
+import dbConnect from "../../../lib/dbConnect";
+import User from "../../../models/User";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
-export default function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).end()
-  }
+export default async function handler(req, res) {
+  await dbConnect();
 
-  const { email, password } = req.body
+  const { email, password } = req.body;
+  const user = await User.findOne({ email });
 
-  if (
-    email === process.env.ADMIN_EMAIL &&
-    password === process.env.ADMIN_PASSWORD
-  ) {
-    const token = jwt.sign(
-      { email, role: "admin" },
-      process.env.JWT_SECRET,
-      { expiresIn: "2h" }
-    )
+  if (!user) return res.status(401).json({ message: "User not found" });
 
-    return res.status(200).json({ token })
-  }
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) return res.status(401).json({ message: "Invalid password" });
 
-  return res.status(401).json({ message: "Invalid credentials" })
+  const token = jwt.sign(
+    { id: user._id, role: user.role },
+    process.env.JWT_SECRET,
+    { expiresIn: "7d" }
+  );
+
+  res.status(200).json({ token, user: { name: user.name, email: user.email } });
 }
