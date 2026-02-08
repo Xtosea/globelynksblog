@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
-// app/api/auth/login/route.js
-import { connectDB } from "../../../lib/mongodb"
-import User from "../../../models/User"
+import { connectDB } from "../../../lib/mongodb";
+import User from "../../../models/User";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
@@ -10,10 +9,17 @@ export async function POST(req) {
     // 🔌 Connect to MongoDB
     await connectDB();
 
-    // 📦 Get email & password from request body
+    // 📦 Parse JSON body
     const { email, password } = await req.json();
 
-    // 🔍 Find user
+    if (!email || !password) {
+      return NextResponse.json(
+        { message: "Email and password are required" },
+        { status: 400 }
+      );
+    }
+
+    // 👤 Find user
     const user = await User.findOne({ email });
     if (!user) {
       return NextResponse.json(
@@ -22,7 +28,7 @@ export async function POST(req) {
       );
     }
 
-    // 🔐 Check password
+    // 🔒 Check password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return NextResponse.json(
@@ -31,25 +37,26 @@ export async function POST(req) {
       );
     }
 
-    // 🪪 Create JWT token
+    // 📝 Generate JWT
     const token = jwt.sign(
-      { id: user._id, role: user.role },
+      { id: user._id, email: user.email, role: user.role },
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
 
-    // ✅ Return token and user info
+    // ✅ Return token + basic user info
     return NextResponse.json({
       token,
       user: {
         id: user._id,
         email: user.email,
-        role: user.role
+        role: user.role,
+        name: user.name
       }
     });
 
   } catch (err) {
-    console.error(err);
+    console.error("POST /api/auth/login error:", err);
     return NextResponse.json(
       { message: "Server error" },
       { status: 500 }
