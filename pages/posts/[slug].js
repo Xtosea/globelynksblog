@@ -27,7 +27,24 @@ export default function PostPage() {
 
   return (
     <>
-      {/* SEO handled in Step 5 */}
+      {/* ✅ SEO META GOES HERE */}
+      <Head>
+        <title>{post.title} | Globelynks Blog</title>
+        <meta name="description" content={post.excerpt} />
+
+        <meta property="og:type" content="article" />
+        <meta property="og:title" content={post.title} />
+        <meta property="og:description" content={post.excerpt} />
+        <meta property="og:image" content={post.image || "/og.png"} />
+        <meta property="og:site_name" content="Globelynks Blog" />
+
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={post.title} />
+        <meta name="twitter:description" content={post.excerpt} />
+        <meta name="twitter:image" content={post.image || "/og.png"} />
+      </Head>
+
+      {/* PAGE CONTENT */}
       <article className="max-w-3xl mx-auto px-6 py-10">
         <h1 className="text-4xl font-bold mb-2">{post.title}</h1>
 
