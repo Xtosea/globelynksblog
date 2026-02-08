@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
-import { connectDB } from "@/lib/mongodb";
-import Post from "@/models/Post";
+import { connectDB } from "../../../lib/mongodb";
+import Post from "../../../models/Post";
 
 export async function POST(req) {
   try {
-    // 🔐 Get token from Authorization header
+    // 🔐 Get Authorization header
     const authHeader = req.headers.get("authorization");
     const token = authHeader?.split(" ")[1];
 
@@ -19,23 +19,40 @@ export async function POST(req) {
     // ✅ Verify token
     jwt.verify(token, process.env.JWT_SECRET);
 
-    // 📦 Parse request body
+    // 📦 Parse JSON body
     const body = await req.json();
+
+    if (!body.title || !body.excerpt || !body.content) {
+      return NextResponse.json(
+        { message: "Title, excerpt, and content are required" },
+        { status: 400 }
+      );
+    }
 
     // 🔌 Connect to MongoDB
     await connectDB();
 
     // ✍️ Create new post
-    const post = await Post.create(body);
+    const post = await Post.create({
+      ...body,
+      publishedAt: new Date()
+    });
 
     return NextResponse.json(post, { status: 201 });
+
   } catch (err) {
-    console.error(err);
+    console.error("POST /api/posts/create error:", err);
 
-    // Distinguish unauthorized vs server errors
-    const status = err.name === "JsonWebTokenError" ? 401 : 500;
-    const message = status === 401 ? "Unauthorized" : "Server error";
+    if (err.name === "JsonWebTokenError") {
+      return NextResponse.json(
+        { message: "Invalid token" },
+        { status: 401 }
+      );
+    }
 
-    return NextResponse.json({ message }, { status });
+    return NextResponse.json(
+      { message: "Server error" },
+      { status: 500 }
+    );
   }
 }
