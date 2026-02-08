@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
-import { connectDB } from "../../../../lib/mongodb";
-import Post from "../../../../models/Post";
+import { connectDB } from "@/lib/mongodb";
+import Post from "@/models/Post";
 
 export async function POST(req) {
   try {
-    // 🔐 Get token
+    // 🔐 Get token from headers
     const authHeader = req.headers.get("authorization");
     const token = authHeader?.split(" ")[1];
 
@@ -16,24 +16,33 @@ export async function POST(req) {
       );
     }
 
-    // ✅ Verify token
+    // ✅ Verify JWT
     jwt.verify(token, process.env.JWT_SECRET);
 
-    // 📦 Parse body
+    // 📦 Parse request body
     const body = await req.json();
 
-    // 🔌 Connect DB
+    // 🔌 Connect to MongoDB
     await connectDB();
 
-    // ✍️ Create post
+    // ✍️ Create new post
     const post = await Post.create(body);
 
     return NextResponse.json(post, { status: 201 });
   } catch (err) {
     console.error(err);
+
+    // If JWT fails, unauthorized
+    if (err.name === "JsonWebTokenError") {
+      return NextResponse.json(
+        { message: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
     return NextResponse.json(
-      { message: "Unauthorized or server error" },
-      { status: 401 }
+      { message: "Server error" },
+      { status: 500 }
     );
   }
 }
