@@ -14,11 +14,30 @@ export default function Publisher() {
     setPost({ ...post, [e.target.name]: e.target.value })
   }
 
-  function handleSubmit(e) {
-    e.preventDefault()
-    console.log("NEW POST:", post)
-    alert("Post logged in console (next step: save it)")
+  function slugify(text) {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "")
+}
+
+function handleSubmit(e) {
+  e.preventDefault()
+
+  const newPost = {
+    ...post,
+    slug: slugify(post.title),
+    date: new Date().toDateString()
   }
+
+  const existing = JSON.parse(localStorage.getItem("publishedPosts")) || []
+  localStorage.setItem(
+    "publishedPosts",
+    JSON.stringify([newPost, ...existing])
+  )
+
+  alert("Post published successfully!")
+}
 
   return (
     <main className="min-h-screen bg-gray-100 px-6 py-10">
