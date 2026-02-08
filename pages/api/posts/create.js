@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken"
 import { connectDB } from "../../../lib/mongodb"
-import Post from "../../../models/Post"
+import Post from "../../../models/post"
 
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).end()
