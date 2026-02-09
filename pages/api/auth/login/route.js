@@ -1,6 +1,6 @@
 // pages/api/auth/login.js
-import { connectDB } from "../../../lib/mongodb";
-import User from "../../../models/User";
+import { connectDB } from "../../../../lib/mongodb";
+import User from "../../../../models/User";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
