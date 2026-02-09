@@ -18,10 +18,15 @@ export default function AdminLogin() {
     const data = await res.json()
 
     if (res.ok) {
-      localStorage.setItem("adminToken", data.token)
+      // ✅ STORE TOKEN USING THE SAME KEY EVERYWHERE
+      localStorage.setItem("token", data.token)
+
+      // optional: store role/user later if you want
+      // localStorage.setItem("user", JSON.stringify(data.user))
+
       router.push("/admin/publish")
     } else {
-      alert(data.message)
+      alert(data.message || "Login failed")
     }
   }
 
@@ -35,6 +40,7 @@ export default function AdminLogin() {
           placeholder="Email"
           className="w-full border p-2"
           onChange={e => setEmail(e.target.value)}
+          required
         />
 
         <input
@@ -42,9 +48,13 @@ export default function AdminLogin() {
           placeholder="Password"
           className="w-full border p-2"
           onChange={e => setPassword(e.target.value)}
+          required
         />
 
-        <button className="bg-blue-600 text-white px-4 py-2">
+        <button
+          type="submit"
+          className="bg-blue-600 text-white px-4 py-2 rounded"
+        >
           Login
         </button>
       </form>
