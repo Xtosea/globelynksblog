@@ -23,7 +23,7 @@ export default function Home() {
 
         {/* Category Navigation */}
         <div className="flex gap-4 mb-10 flex-wrap">
-          {["breaking", "politics", "business", "tech", "sports", "Entertainment", Education", "Wedding", Ceremonies"].map(cat => (
+          {["breaking", "politics", "business", "tech", "sports", "Entertainment", "Education", "Wedding", "International/World", "Health & Science",  "News Bulletins/Alerts", "Interviews/Profiles", "Ceremonies"].map(cat => (
             <Link
               key={cat}
               href={`/category/${cat}`}
