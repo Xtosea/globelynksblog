@@ -1,3 +1,5 @@
+export const runtime = "nodejs"
+
 import { NextResponse } from "next/server"
 import { connectDB } from "../../../lib/mongodb"
 import User from "../../../models/User"
@@ -19,7 +21,7 @@ export async function GET() {
     await User.create({
       name: "Admin",
       email: process.env.ADMIN_EMAIL,
-      password: process.env.ADMIN_PASSWORD, // 👈 PLAIN TEXT
+      password: process.env.ADMIN_PASSWORD, // plain text
       role: "admin",
     })
 
