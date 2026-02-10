@@ -1,12 +1,7 @@
 import { v2 as cloudinary } from "cloudinary";
-import formidable from "formidable";
-import fs from "fs";
+import { NextResponse } from "next/server";
 
-export const config = {
-  api: {
-    bodyParser: false, // we handle parsing manually
-  },
-};
+export const runtime = "nodejs";
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -14,30 +9,38 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ message: "Method not allowed" });
-  }
+export async function POST(req) {
+  try {
+    const formData = await req.formData();
+    const file = formData.get("file");
 
-  const form = new formidable.IncomingForm();
-
-  form.parse(req, async (err, fields, files) => {
-    if (err) return res.status(500).json({ message: "Form parse error" });
-
-    const file = files.file;
-    if (!file) return res.status(400).json({ message: "No file uploaded" });
-
-    try {
-      const result = await cloudinary.uploader.upload(file.filepath, {
-        folder: "blog-images",
-      });
-      res.status(200).json({ url: result.secure_url });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: "Cloudinary upload failed" });
-    } finally {
-      // Clean up temp file
-      fs.unlink(file.filepath, () => {});
+    if (!file) {
+      return NextResponse.json(
+        { message: "No file uploaded" },
+        { status: 400 }
+      );
     }
-  });
+
+    // Convert file to buffer
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+
+    const uploadResult = await new Promise((resolve, reject) => {
+      cloudinary.uploader.upload_stream(
+        { folder: "blog-images" },
+        (error, result) => {
+          if (error) reject(error);
+          else resolve(result);
+        }
+      ).end(buffer);
+    });
+
+    return NextResponse.json({ url: uploadResult.secure_url });
+  } catch (err) {
+    console.error("Upload error:", err);
+    return NextResponse.json(
+      { message: "Upload failed" },
+      { status: 500 }
+    );
+  }
 }
