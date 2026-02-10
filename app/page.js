@@ -1,80 +1,65 @@
+"use client"
+
+import { useEffect, useState } from "react"
 import Link from "next/link"
-import { posts } from "../data/posts"
 
 export default function Home() {
-  // Sort posts by published date (newest first)
-  const sortedPosts = [...posts].sort(
-    (a, b) => new Date(b.publishedAt) - new Date(a.publishedAt)
-  )
+  const [posts, setPosts] = useState([])
 
-  // Featured post = newest post
-  const [featured, ...rest] = sortedPosts
+  useEffect(() => {
+    fetch("/api/posts")
+      .then(res => res.json())
+      .then(data => setPosts(data))
+      .catch(err => console.error(err))
+  }, [])
 
   return (
     <main className="min-h-screen bg-gray-50 px-6 py-10">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-4xl mx-auto">
 
-        {/* --- Header --- */}
-        <h1 className="text-5xl font-bold mb-2 text-center">Globelynks Blog</h1>
-        <p className="text-gray-600 text-center mb-10">
-          Fresh ideas, stories, and updates from Nigeria and beyond
-        </p>
+        {/* Blog Header */}
+        <h1 className="text-4xl font-bold mb-2">Globelynks Blog</h1>
+        <p className="text-gray-600 mb-6">Fresh ideas, stories, and updates.</p>
 
-        {/* --- Category Navigation --- */}
-        <div className="flex justify-center gap-4 mb-10 flex-wrap">
+        {/* Category Navigation */}
+        <div className="flex gap-4 mb-10 flex-wrap">
           {["breaking", "politics", "business", "tech", "sports"].map(cat => (
             <Link
               key={cat}
               href={`/category/${cat}`}
-              className="px-3 py-1 rounded-full bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition"
+              className="text-sm font-medium text-blue-600 hover:underline"
             >
               {cat.toUpperCase()}
             </Link>
           ))}
         </div>
 
-        {/* --- Featured Post --- */}
-        {featured && (
-          <div className="bg-white rounded-xl shadow-lg overflow-hidden mb-12">
-            <img
-              src={featured.image}
-              alt={featured.title}
-              className="w-full h-80 object-cover"
-            />
-            <div className="p-6">
-              <h2 className="text-3xl font-bold mb-2">
-                <Link href={`/posts/${featured.slug}`} className="hover:underline">
-                  {featured.title}
+        {/* Blog Posts */}
+        <div className="space-y-8">
+          {posts.map(post => (
+            <div key={post._id} className="bg-white p-6 rounded-xl shadow hover:shadow-lg transition">
+              <h2 className="text-2xl font-semibold mb-2">
+                <Link href={`/posts/${post.slug}`} className="hover:underline">
+                  {post.title}
                 </Link>
               </h2>
-              <p className="text-gray-500 text-sm mb-4">
-                {featured.author} · {new Date(featured.publishedAt).toDateString()}
-              </p>
-              <p className="text-gray-700">{featured.excerpt}</p>
-            </div>
-          </div>
-        )}
 
-        {/* --- Other Posts Grid --- */}
-        <div className="grid md:grid-cols-2 gap-8">
-          {rest.map(post => (
-            <div key={post._id} className="bg-white rounded-xl shadow overflow-hidden">
-              <img
-                src={post.image}
-                alt={post.title}
-                className="w-full h-48 object-cover"
-              />
-              <div className="p-4">
-                <h3 className="text-xl font-semibold mb-1">
-                  <Link href={`/posts/${post.slug}`} className="hover:underline">
-                    {post.title}
-                  </Link>
-                </h3>
-                <p className="text-gray-500 text-sm mb-2">
-                  {post.author} · {new Date(post.publishedAt).toDateString()}
-                </p>
-                <p className="text-gray-700 text-sm">{post.excerpt}</p>
-              </div>
+              <p className="text-gray-500 text-sm mb-3">
+                {post.author} ·{" "}
+                {post.publishedAt
+                  ? new Date(post.publishedAt).toDateString()
+                  : "Unknown date"}
+              </p>
+
+              <p className="text-gray-700">{post.excerpt}</p>
+
+              {post.image && (
+                <img
+                  src={post.image}
+                  alt={post.title}
+                  className="w-full h-64 object-cover rounded mt-4"
+                />
+              )}
             </div>
           ))}
         </div>
