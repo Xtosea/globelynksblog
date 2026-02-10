@@ -1,30 +1,38 @@
+export const runtime = "nodejs"; // important for bcrypt
+
+import { NextResponse } from "next/server";
 import { connectDB } from "../../../../lib/mongodb";
 import User from "../../../../models/User";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
-export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ message: "Method not allowed" });
-  }
-
+export async function POST(req) {
   try {
     await connectDB();
 
-    const { email, password } = req.body;
+    const { email, password } = await req.json();
 
     if (!email || !password) {
-      return res.status(400).json({ message: "Email and password required" });
+      return NextResponse.json(
+        { message: "Email and password required" },
+        { status: 400 }
+      );
     }
 
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(401).json({ message: "Invalid credentials" });
+      return NextResponse.json(
+        { message: "Invalid credentials" },
+        { status: 401 }
+      );
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(401).json({ message: "Invalid credentials" });
+      return NextResponse.json(
+        { message: "Invalid credentials" },
+        { status: 401 }
+      );
     }
 
     const token = jwt.sign(
@@ -33,7 +41,7 @@ export default async function handler(req, res) {
       { expiresIn: "7d" }
     );
 
-    return res.status(200).json({
+    return NextResponse.json({
       token,
       user: {
         id: user._id,
@@ -43,7 +51,10 @@ export default async function handler(req, res) {
       },
     });
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({ message: "Server error" });
+    console.error("Login error:", err);
+    return NextResponse.json(
+      { message: "Server error" },
+      { status: 500 }
+    );
   }
 }
