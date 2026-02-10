@@ -14,44 +14,64 @@ export default function Home() {
   }, [])
 
   return (
-    <main className="min-h-screen bg-gray-50 px-6 py-10">
-      <div className="max-w-3xl mx-auto">
+    <main className="min-h-screen bg-gray-50 px-6 py-12">
+      <div className="max-w-6xl mx-auto">
 
-        <h1 className="text-4xl font-bold mb-2">Globelynks Blog</h1>
-        <p className="text-gray-600 mb-6">
-          Fresh ideas, stories, and updates.
-        </p>
+        {/* --- Header --- */}
+        <header className="text-center mb-12">
+          <h1 className="text-5xl font-bold mb-2">Globelynks Blog</h1>
+          <p className="text-gray-600 text-lg">
+            Fresh news, ideas, and stories from around the world.
+          </p>
+        </header>
 
-        <div className="flex gap-4 mb-10 flex-wrap">
+        {/* --- Categories --- */}
+        <nav className="flex justify-center gap-4 mb-12 flex-wrap">
           {["breaking", "politics", "business", "tech", "sports"].map(cat => (
             <Link
               key={cat}
               href={`/category/${cat}`}
-              className="text-sm font-medium text-blue-600 hover:underline"
+              className="px-4 py-2 bg-blue-100 text-blue-700 rounded-full hover:bg-blue-200 transition font-medium"
             >
               {cat.toUpperCase()}
             </Link>
           ))}
-        </div>
+        </nav>
 
-        <div className="space-y-8">
+        {/* --- Blog Posts Grid --- */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {posts.map(post => (
-            <div key={post._id} className="bg-white p-6 rounded-xl shadow">
-              <h2 className="text-2xl font-semibold">
-                <Link href={`/posts/${post.slug}`}>
-                  {post.title}
+            <article
+              key={post._id}
+              className="bg-white rounded-xl shadow hover:shadow-lg transition overflow-hidden"
+            >
+              {post.image && (
+                <img
+                  src={post.image}
+                  alt={post.title}
+                  className="w-full h-56 object-cover"
+                />
+              )}
+              <div className="p-6">
+                <h2 className="text-2xl font-semibold mb-2">
+                  <Link href={`/posts/${post.slug}`} className="hover:text-blue-600">
+                    {post.title}
+                  </Link>
+                </h2>
+                <p className="text-sm text-gray-500 mb-3">
+                  {post.author} · {new Date(post.publishedAt).toDateString()}
+                </p>
+                <p className="text-gray-700 line-clamp-3">
+                  {post.excerpt}
+                </p>
+                <Link
+                  href={`/posts/${post.slug}`}
+                  className="inline-block mt-4 text-blue-600 font-medium hover:underline"
+                >
+                  Read more →
                 </Link>
-              </h2>
-
-              <p className="text-gray-500 text-sm mt-1">
-                {post.author} ·{" "}
-                {new Date(post.publishedAt).toDateString()}
-              </p>
-
-              <p className="mt-4 text-gray-700">
-                {post.excerpt}
-              </p>
-            </div>
+              </div>
+            </article>
           ))}
         </div>
 
