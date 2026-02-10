@@ -17,6 +17,7 @@
     "cloudinary": "^2.9.0",
     "date-fns": "4.1.0",
     "dotenv": "^17.2.4",
+    "formidable": "^3.5.4",
     "gray-matter": "^4.0.3",
     "intl-segmenter-polyfill": "0.4.4",
     "jsonwebtoken": "^9.0.3",
