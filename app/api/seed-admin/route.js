@@ -1,36 +1,45 @@
-import { connectDB } from "../../../lib/mongodb";
-import User from "../../../models/User";
+import { NextResponse } from "next/server"
+import connectDB from "@/lib/mongodb"
+import User from "@/models/User"
+import bcrypt from "bcryptjs"
 
-export default async function handler(req, res) {
+export async function GET() {
   try {
-    await connectDB();
-    console.log("DB connected");
+    await connectDB()
 
-    const existingAdmin = await User.findOne({
-      email: "admin@globelynks.com",
-    });
+    // Check if admin already exists
+    const adminExists = await User.findOne({
+      email: process.env.ADMIN_EMAIL,
+    })
 
-    if (existingAdmin) {
-      return res.status(400).json({ message: "Admin already exists" });
+    if (adminExists) {
+      return NextResponse.json({
+        message: "Admin already exists",
+      })
     }
 
-    const admin = await User.create({
-      name: "Admin",
-      email: "admin@globelynks.com",
-      password: "password123", // ✅ plain text
-      role: "admin",
-    });
+    // Hash password
+    const hashedPassword = await bcrypt.hash(
+      process.env.ADMIN_PASSWORD,
+      10
+    )
 
-    return res.status(201).json({
+    // Create admin user
+    await User.create({
+      name: "Admin",
+      email: process.env.ADMIN_EMAIL,
+      password: hashedPassword,
+      role: "admin",
+    })
+
+    return NextResponse.json({
       message: "Admin created successfully",
-      admin: {
-        id: admin._id,
-        email: admin.email,
-        role: admin.role,
-      },
-    });
-  } catch (err) {
-    console.error("Error in seed-admin:", err);
-    return res.status(500).json({ message: "Server error", error: err.message });
+    })
+  } catch (error) {
+    console.error("Seed admin error:", error)
+    return NextResponse.json(
+      { error: "Failed to seed admin" },
+      { status: 500 }
+    )
   }
 }
