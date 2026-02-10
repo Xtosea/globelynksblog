@@ -16,8 +16,8 @@ export default async function handler(req, res) {
 
     const admin = await User.create({
       name: "Admin",
-      email: "admin@globelynks.com",
-      password: hashedPassword,
+      email: "xto1971@gmail.com",
+      password: 123456,
       role: "admin",
     });
 
