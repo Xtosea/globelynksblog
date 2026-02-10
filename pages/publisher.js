@@ -13,7 +13,7 @@ export default function Publisher() {
   });
 
   const [loading, setLoading] = useState(false);
-  const [uploading, setUploading] = useState(false); // spinner for image
+  const [uploading, setUploading] = useState(false);
 
   // Handle input changes
   function handleChange(e) {
@@ -48,7 +48,6 @@ export default function Publisher() {
       const data = await res.json();
       if (res.ok) {
         setPost(prev => ({ ...prev, image: data.url }));
-        alert("Image uploaded successfully!");
       } else {
         alert(data.message || "Upload failed");
       }
@@ -65,7 +64,12 @@ export default function Publisher() {
     e.preventDefault();
 
     if (!post.title || !post.excerpt || !post.content) {
-      alert("Title, excerpt and content are required");
+      alert("Title, excerpt, and content are required");
+      return;
+    }
+
+    if (!post.image) {
+      alert("Please upload an image for the post");
       return;
     }
 
@@ -74,7 +78,7 @@ export default function Publisher() {
     const newPost = {
       ...post,
       slug,
-      publishedAt: new Date()
+      publishedAt: new Date(),
     };
 
     try {
@@ -85,12 +89,13 @@ export default function Publisher() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
+          "Authorization": `Bearer ${token}`,
         },
-        body: JSON.stringify(newPost)
+        body: JSON.stringify(newPost),
       });
 
       const data = await res.json();
+
       if (!res.ok) {
         alert(data.message || "Failed to publish post");
         return;
@@ -105,7 +110,7 @@ export default function Publisher() {
         author: "Globelynks News",
         image: "",
         excerpt: "",
-        content: ""
+        content: "",
       });
     } catch (err) {
       console.error(err);
@@ -188,9 +193,9 @@ export default function Publisher() {
 
           <button
             type="submit"
-            disabled={loading || uploading}
+            disabled={loading || uploading || !post.image}
             className={`bg-blue-600 hover:bg-blue-700 transition text-white px-6 py-3 rounded font-semibold ${
-              loading || uploading ? "opacity-50 cursor-not-allowed" : ""
+              loading || uploading || !post.image ? "opacity-50 cursor-not-allowed" : ""
             }`}
           >
             {loading ? "Publishing..." : "Publish"}
