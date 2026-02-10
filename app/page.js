@@ -13,15 +13,28 @@ export default function Home() {
       .catch(err => console.error(err))
   }, [])
 
+  if (!posts || posts.length === 0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-gray-600">
+        Loading posts...
+      </div>
+    )
+  }
+
+  // Featured post is the latest one
+  const [featured, ...rest] = posts.sort(
+    (a, b) => new Date(b.publishedAt) - new Date(a.publishedAt)
+  )
+
   return (
     <main className="min-h-screen bg-gray-50 px-6 py-12">
       <div className="max-w-6xl mx-auto">
 
         {/* --- Header --- */}
         <header className="text-center mb-12">
-          <h1 className="text-5xl font-bold mb-2">Globelynks Blog</h1>
+          <h1 className="text-5xl font-bold mb-2">Globelynks News</h1>
           <p className="text-gray-600 text-lg">
-            Fresh news, ideas, and stories from around the world.
+            Latest stories, updates, and trending news.
           </p>
         </header>
 
@@ -38,9 +51,39 @@ export default function Home() {
           ))}
         </nav>
 
-        {/* --- Blog Posts Grid --- */}
+        {/* --- Featured Post --- */}
+        {featured && (
+          <article className="mb-12 bg-white rounded-xl shadow overflow-hidden hover:shadow-lg transition">
+            {featured.image && (
+              <img
+                src={featured.image}
+                alt={featured.title}
+                className="w-full h-80 object-cover"
+              />
+            )}
+            <div className="p-6">
+              <h2 className="text-3xl font-bold mb-2 hover:text-blue-600 transition">
+                <Link href={`/posts/${featured.slug}`}>
+                  {featured.title}
+                </Link>
+              </h2>
+              <p className="text-gray-500 text-sm mb-4">
+                {featured.author} · {new Date(featured.publishedAt).toDateString()}
+              </p>
+              <p className="text-gray-700 line-clamp-4 mb-4">{featured.excerpt}</p>
+              <Link
+                href={`/posts/${featured.slug}`}
+                className="text-blue-600 font-medium hover:underline"
+              >
+                Read full article →
+              </Link>
+            </div>
+          </article>
+        )}
+
+        {/* --- Other Posts Grid --- */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {posts.map(post => (
+          {rest.map(post => (
             <article
               key={post._id}
               className="bg-white rounded-xl shadow hover:shadow-lg transition overflow-hidden"
@@ -53,20 +96,18 @@ export default function Home() {
                 />
               )}
               <div className="p-6">
-                <h2 className="text-2xl font-semibold mb-2">
-                  <Link href={`/posts/${post.slug}`} className="hover:text-blue-600">
+                <h3 className="text-2xl font-semibold mb-2 hover:text-blue-600 transition">
+                  <Link href={`/posts/${post.slug}`}>
                     {post.title}
                   </Link>
-                </h2>
+                </h3>
                 <p className="text-sm text-gray-500 mb-3">
                   {post.author} · {new Date(post.publishedAt).toDateString()}
                 </p>
-                <p className="text-gray-700 line-clamp-3">
-                  {post.excerpt}
-                </p>
+                <p className="text-gray-700 line-clamp-3 mb-3">{post.excerpt}</p>
                 <Link
                   href={`/posts/${post.slug}`}
-                  className="inline-block mt-4 text-blue-600 font-medium hover:underline"
+                  className="text-blue-600 font-medium hover:underline"
                 >
                   Read more →
                 </Link>
