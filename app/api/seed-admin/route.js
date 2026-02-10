@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server"
 import { connectDB } from "../../../lib/mongodb"
 import User from "../../../models/User"
-import bcrypt from "bcryptjs"
 
 export async function GET() {
   try {
@@ -17,15 +16,10 @@ export async function GET() {
       })
     }
 
-    const hashedPassword = await bcrypt.hash(
-      process.env.ADMIN_PASSWORD,
-      10
-    )
-
     await User.create({
       name: "Admin",
       email: process.env.ADMIN_EMAIL,
-      password: hashedPassword,
+      password: process.env.ADMIN_PASSWORD, // 👈 PLAIN TEXT
       role: "admin",
     })
 
