@@ -5,9 +5,12 @@ export default async function handler(req, res) {
   const { slug } = req.query
 
   await connectDB()
-  const post = await Post.findOne({ slug })
 
-  if (!post) return res.status(404).json({ message: "Post not found" })
+  const post = await Post.findOne({ slug }).lean()
+
+  if (!post) {
+    return res.status(404).json({ message: "Post not found" })
+  }
 
   res.status(200).json(post)
 }
