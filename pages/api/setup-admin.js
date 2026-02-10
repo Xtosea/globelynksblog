@@ -1,7 +1,27 @@
+// pages/api/setup-admin.js
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 
-// define User schema directly in this file (temporary, one-off)
+const MONGODB_URI = process.env.MONGODB_URI;
+
+if (!MONGODB_URI) {
+  throw new Error("Please define MONGODB_URI in environment variables");
+}
+
+// Cache connection for Vercel serverless
+let cached = global.mongoose || { conn: null, promise: null };
+global.mongoose = cached;
+
+async function connectDB() {
+  if (cached.conn) return cached.conn;
+  if (!cached.promise) {
+    cached.promise = mongoose.connect(MONGODB_URI, { dbName: "Globeblog1" });
+  }
+  cached.conn = await cached.promise;
+  return cached.conn;
+}
+
+// Define User schema locally to avoid Turbopack issue
 const UserSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
@@ -19,21 +39,7 @@ UserSchema.pre("save", async function (next) {
 
 const User = mongoose.models.User || mongoose.model("User", UserSchema);
 
-// simple connectDB
-const MONGODB_URI = process.env.MONGODB_URI;
-let cached = global.mongoose || { conn: null, promise: null };
-global.mongoose = cached;
-
-async function connectDB() {
-  if (cached.conn) return cached.conn;
-  if (!cached.promise) {
-    cached.promise = mongoose.connect(MONGODB_URI, { dbName: "Globeblog1" });
-  }
-  cached.conn = await cached.promise;
-  return cached.conn;
-}
-
-// handler
+// API handler
 export default async function handler(req, res) {
   try {
     await connectDB();
@@ -44,8 +50,8 @@ export default async function handler(req, res) {
 
     const user = await User.create({
       name: "Admin",
-      email: "xto1971@gmail.com",
-      password: "123456",
+      email: "admin@globelynks.com",
+      password: "password123",
       role: "admin",
     });
 
