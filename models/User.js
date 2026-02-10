@@ -7,7 +7,8 @@ const UserSchema = new mongoose.Schema({
   password: { type: String, required: true },
   role: { type: String, default: "admin" },
   createdAt: { type: Date, default: Date.now },
-});
+})
+
 
 // Hash password before saving
 UserSchema.pre("save", async function(next) {
@@ -18,3 +19,8 @@ UserSchema.pre("save", async function(next) {
 });
 
 export default mongoose.models.User || mongoose.model("User", UserSchema);
+
+
+
+
+  
