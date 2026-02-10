@@ -1,43 +1,43 @@
-import { NextResponse } from "next/server";
-import cloudinary from "../../../lib/cloudinary";
+import { v2 as cloudinary } from "cloudinary";
+import formidable from "formidable";
+import fs from "fs";
 
-export const runtime = "nodejs"; // important for Node APIs
+export const config = {
+  api: {
+    bodyParser: false, // we handle parsing manually
+  },
+};
 
-export async function POST(req) {
-  try {
-    const data = await req.formData();
-    const file = data.get("file");
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
-    if (!file) {
-      return NextResponse.json({ message: "No file uploaded" }, { status: 400 });
-    }
-
-    // Convert file to buffer
-    const buffer = Buffer.from(await file.arrayBuffer());
-
-    const result = await cloudinary.uploader.upload_stream({ resource_type: "image" }, (err, res) => {
-      if (err) throw err;
-      return res;
-    });
-
-    // Upload using upload_stream
-    const streamUpload = (buffer) =>
-      new Promise((resolve, reject) => {
-        const stream = cloudinary.uploader.upload_stream(
-          { folder: "posts" },
-          (error, result) => {
-            if (result) resolve(result);
-            else reject(error);
-          }
-        );
-        stream.end(buffer);
-      });
-
-    const uploadResult = await streamUpload(buffer);
-
-    return NextResponse.json({ url: uploadResult.secure_url });
-  } catch (err) {
-    console.error("Upload error:", err);
-    return NextResponse.json({ message: "Upload failed" }, { status: 500 });
+export default async function handler(req, res) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ message: "Method not allowed" });
   }
+
+  const form = new formidable.IncomingForm();
+
+  form.parse(req, async (err, fields, files) => {
+    if (err) return res.status(500).json({ message: "Form parse error" });
+
+    const file = files.file;
+    if (!file) return res.status(400).json({ message: "No file uploaded" });
+
+    try {
+      const result = await cloudinary.uploader.upload(file.filepath, {
+        folder: "blog-images",
+      });
+      res.status(200).json({ url: result.secure_url });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Cloudinary upload failed" });
+    } finally {
+      // Clean up temp file
+      fs.unlink(file.filepath, () => {});
+    }
+  });
 }
