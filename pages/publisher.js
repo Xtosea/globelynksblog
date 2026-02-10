@@ -13,12 +13,15 @@ export default function Publisher() {
   });
 
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false); // spinner for image
 
+  // Handle input changes
   function handleChange(e) {
     const { name, value } = e.target;
     setPost(prev => ({ ...prev, [name]: value }));
   }
 
+  // Slugify title
   function slugify(text) {
     return text
       .toLowerCase()
@@ -27,10 +30,40 @@ export default function Publisher() {
       .replace(/(^-|-$)/g, "");
   }
 
+  // Handle image upload to Cloudinary
+  async function handleImageUpload(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploading(true);
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        setPost(prev => ({ ...prev, image: data.url }));
+        alert("Image uploaded successfully!");
+      } else {
+        alert(data.message || "Upload failed");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Upload error. Check console.");
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  // Handle publishing post
   async function handleSubmit(e) {
     e.preventDefault();
 
-    // Basic validation
     if (!post.title || !post.excerpt || !post.content) {
       alert("Title, excerpt and content are required");
       return;
@@ -47,8 +80,7 @@ export default function Publisher() {
     try {
       setLoading(true);
 
-      const token = localStorage.getItem("token"); // your JWT from login
-
+      const token = localStorage.getItem("token");
       const res = await fetch("/api/posts/create", {
         method: "POST",
         headers: {
@@ -59,10 +91,8 @@ export default function Publisher() {
       });
 
       const data = await res.json();
-
       if (!res.ok) {
         alert(data.message || "Failed to publish post");
-        setLoading(false);
         return;
       }
 
@@ -77,7 +107,6 @@ export default function Publisher() {
         excerpt: "",
         content: ""
       });
-
     } catch (err) {
       console.error(err);
       alert("Server error. Check console.");
@@ -121,13 +150,23 @@ export default function Publisher() {
             onChange={handleChange}
           />
 
-          <input
-            name="image"
-            value={post.image}
-            placeholder="Image URL"
-            className="w-full border p-3 rounded"
-            onChange={handleChange}
-          />
+          {/* Image upload */}
+          <div>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              className="mb-2"
+            />
+            {uploading && <p className="text-sm text-gray-500">Uploading image...</p>}
+            {post.image && (
+              <img
+                src={post.image}
+                alt="Uploaded"
+                className="w-40 h-40 object-cover rounded mt-2"
+              />
+            )}
+          </div>
 
           <textarea
             name="excerpt"
@@ -149,8 +188,10 @@ export default function Publisher() {
 
           <button
             type="submit"
-            disabled={loading}
-            className={`bg-blue-600 hover:bg-blue-700 transition text-white px-6 py-3 rounded font-semibold ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
+            disabled={loading || uploading}
+            className={`bg-blue-600 hover:bg-blue-700 transition text-white px-6 py-3 rounded font-semibold ${
+              loading || uploading ? "opacity-50 cursor-not-allowed" : ""
+            }`}
           >
             {loading ? "Publishing..." : "Publish"}
           </button>
