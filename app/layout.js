@@ -1,18 +1,18 @@
 import "../styles/globals.css"
-import Navbar from "../components/Navbar"
-import Footer from "../components/Footer"
+import Navbar from "./components/Navbar"
+import Footer from "./components/Footer"
 
 export const metadata = {
-  title: "Globelynks Blog",
+  title: "Globelynks News And Entertainment",
   description: "News & Articles",
 }
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body>
+      <body className="bg-gray-50 text-gray-900">
         <Navbar />
-        {children}
+        <main className="min-h-screen">{children}</main>
         <Footer />
       </body>
     </html>
