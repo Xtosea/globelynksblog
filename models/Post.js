@@ -1,23 +1,15 @@
 import mongoose from "mongoose"
 
 const PostSchema = new mongoose.Schema({
-  title: String,
-  slug: String,
-  excerpt: String,
-  content: String,
-  image: String,
-  category: String,
-  author: String,
-  publishedAt: {
-    type: Date,
-    default: Date.now
-  }
+  title: { type: String, required: true },
+  slug: { type: String, required: true, unique: true },
+  excerpt: { type: String },
+  content: { type: String },
+  image: { type: String },
+  category: { type: String },
+  author: { type: String },
+  publishedAt: { type: Date, default: Date.now },
+  views: { type: Number, default: 0 } // <-- must be inside schema
 })
 
-views: {
-  type: Number,
-  default: 0
-}
-
-export default mongoose.models.Post ||
-  mongoose.model("Post", PostSchema)
+export default mongoose.models.Post || mongoose.model("Post", PostSchema)
