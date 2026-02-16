@@ -1,39 +1,24 @@
-const mongoose = require("mongoose");
-const bcrypt = require("bcryptjs");
-require("dotenv").config();
+import dbConnect from "../../../lib/mongodb";
+import User from "../../../models/User";
+import bcrypt from "bcryptjs";
 
-// Import your User model
-const User = require("../models/User");
+export default async function handler(req, res) {
+  if (req.method !== "POST") return res.status(405).end();
 
-async function seedAdmin() {
-  try {
-    await mongoose.connect(process.env.MONGODB_URI);
+  await dbConnect();
 
-    const existing = await User.findOne({
-      email: "preciousikelegbe@gmail.com",
-    });
+  const existing = await User.findOne({ email: "preciousikelegbe@gmail.com" });
+  if (existing) return res.status(400).json({ message: "Admin exists" });
 
-    if (existing) {
-      console.log("Admin already exists.");
-      process.exit();
-    }
+  const hashedPassword = await bcrypt.hash("123456", 10);
 
-    const hashedPassword = await bcrypt.hash("123456", 10);
+  const admin = new User({
+    email: "preciousikelegbe@gmail.com",
+    password: hashedPassword,
+    role: "admin",
+  });
 
-    const admin = new User({
-      email: "preciousikelegbe@gmail.com",
-      password: hashedPassword,
-      role: "admin",
-    });
+  await admin.save();
 
-    await admin.save();
-
-    console.log("Admin user created successfully!");
-    process.exit();
-  } catch (err) {
-    console.error(err);
-    process.exit(1);
-  }
+  res.status(201).json({ message: "Admin created" });
 }
-
-seedAdmin();
