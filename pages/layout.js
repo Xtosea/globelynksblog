@@ -1,4 +1,4 @@
-// app/layout.js (remove "use client")
+// app/layout.js (server component)
 import "../styles/globals.css"
 import Navbar from "../components/Navbar"
 import Footer from "../components/Footer"
@@ -12,7 +12,8 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="bg-white text-black transition-colors duration-300 dark:bg-gray-900 dark:text-white">
-        <Navbar />   {/* Client component inside server layout is fine */}
+        {/* Navbar is client, works inside server layout */}
+        <Navbar />
         <main className="min-h-screen">{children}</main>
         <Footer />
       </body>
