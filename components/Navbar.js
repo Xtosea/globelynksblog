@@ -28,22 +28,23 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <span className="font-bold text-lg tracking-wide">GLOBELYNKS</span>
 
-          <div className="flex items-center gap-3">
+          {/* Search + Dark + Hamburger */}
+          <div className="flex items-center gap-2 md:gap-3">
             <input
               type="text"
               placeholder="Search news..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="border px-3 py-1 rounded text-sm text-black"
+              className="border px-2 py-1 rounded text-sm text-black w-24 sm:w-32 md:w-48 lg:w-64"
             />
             <button
               onClick={toggleDark}
-              className="bg-gray-200 text-black px-3 py-1 rounded"
+              className="bg-gray-200 text-black px-2 py-1 rounded text-sm"
             >
               🌙
             </button>
             <button
-              className="md:hidden text-2xl px-3 py-1 z-50"
+              className="md:hidden text-2xl px-2 py-1 z-50"
               onClick={() => setOpen(!open)}
             >
               ☰
@@ -54,7 +55,9 @@ export default function Navbar() {
 
       {/* Category Menu */}
       <nav className="bg-white border-b sticky top-0 z-40">
-        <div className={`max-w-7xl mx-auto flex flex-col md:flex-row gap-6 px-6 py-3 overflow-x-auto transition-all duration-300 ${open ? "flex" : "hidden md:flex"}`}>
+        <div
+          className={`max-w-7xl mx-auto flex flex-col md:flex-row gap-4 md:gap-6 px-6 py-3 overflow-x-auto transition-all duration-300 ${open ? "flex" : "hidden md:flex"}`}
+        >
           <Link
             href="/"
             className={`font-semibold ${pathname === "/" ? "text-red-600 border-b-2 border-red-600" : "text-gray-700"}`}
@@ -69,7 +72,9 @@ export default function Navbar() {
               <Link
                 key={slug}
                 href={`/category/${slug}`}
-                className={`uppercase text-sm font-semibold pb-1 transition ${isActive ? "text-red-600 border-b-2 border-red-600" : "text-gray-700 hover:text-red-600"}`}
+                className={`uppercase text-sm font-semibold pb-1 transition ${
+                  isActive ? "text-red-600 border-b-2 border-red-600" : "text-gray-700 hover:text-red-600"
+                }`}
               >
                 {cat}
               </Link>
