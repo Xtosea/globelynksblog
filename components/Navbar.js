@@ -1,3 +1,4 @@
+// components/Navbar.js
 "use client"
 
 import { useState } from "react"
@@ -5,7 +6,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 
 export default function Navbar() {
-  const pathname = usePathname() // ✅ correct hook
+  const pathname = usePathname()
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState("")
 
@@ -16,24 +17,14 @@ export default function Navbar() {
   }
 
   const categories = [
-    "breaking",
-    "politics",
-    "business",
-    "tech",
-    "sports",
-    "entertainment",
-    "education",
-    "international",
-    "health",
-    "interview",
-    "news bulletins",
-    "wedding",
-    "ceremonies",
+    "breaking","politics","business","tech","sports",
+    "entertainment","education","international","health",
+    "interview","news bulletins","wedding","ceremonies"
   ]
 
   return (
     <>
-      {/* 🔴 Top Red Header */}
+      {/* Top Red Header */}
       <div className="bg-red-700 text-white text-sm py-2 px-6">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <span className="font-bold text-lg tracking-wide">GLOBELYNKS</span>
@@ -63,19 +54,13 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* 📰 Category Navigation */}
+      {/* Category Navigation */}
       <nav className="bg-white border-b sticky top-0 z-50">
-        <div
-          className={`max-w-7xl mx-auto flex-col md:flex md:flex-row gap-6 px-6 py-3 overflow-x-auto ${
-            open ? "flex" : "hidden md:flex"
-          }`}
-        >
+        <div className={`max-w-7xl mx-auto flex-col md:flex md:flex-row gap-6 px-6 py-3 overflow-x-auto ${open ? "flex" : "hidden md:flex"}`}>
           {/* Home Link */}
           <Link
             href="/"
-            className={`font-semibold ${
-              pathname === "/" ? "text-red-600 border-b-2 border-red-600" : "text-gray-700"
-            }`}
+            className={`font-semibold ${pathname === "/" ? "text-red-600 border-b-2 border-red-600" : "text-gray-700"}`}
           >
             HOME
           </Link>
@@ -88,11 +73,7 @@ export default function Navbar() {
               <Link
                 key={slug}
                 href={`/category/${slug}`}
-                className={`uppercase text-sm font-semibold pb-1 transition ${
-                  isActive
-                    ? "text-red-600 border-b-2 border-red-600"
-                    : "text-gray-700 hover:text-red-600"
-                }`}
+                className={`uppercase text-sm font-semibold pb-1 transition ${isActive ? "text-red-600 border-b-2 border-red-600" : "text-gray-700 hover:text-red-600"}`}
               >
                 {cat}
               </Link>
