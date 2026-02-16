@@ -7,8 +7,8 @@ import { usePathname } from "next/navigation"
 export default function Navbar() {
   const pathname = usePathname()
   const [search, setSearch] = useState("")
+  const [open, setOpen] = useState(false) // ✅ Hamburger state
 
-  // ✅ FIX: Define toggleDark
   const toggleDark = () => {
     if (typeof window !== "undefined") {
       document.documentElement.classList.toggle("dark")
@@ -36,12 +36,9 @@ export default function Navbar() {
       {/* 🔴 Top Red Header */}
       <div className="bg-red-700 text-white text-sm py-2 px-6">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <span className="font-bold text-lg tracking-wide">
-            GLOBELYNKS
-          </span>
+          <span className="font-bold text-lg tracking-wide">GLOBELYNKS</span>
 
           <div className="flex items-center gap-3">
-
             {/* 🔎 Search */}
             <input
               type="text"
@@ -58,14 +55,25 @@ export default function Navbar() {
             >
               🌙
             </button>
+
+            {/* ☰ Hamburger (mobile only) */}
+            <button
+              className="md:hidden text-2xl px-3 py-1"
+              onClick={() => setOpen(!open)}
+            >
+              ☰
+            </button>
           </div>
         </div>
       </div>
 
       {/* 📰 Category Navigation */}
       <nav className="bg-white border-b sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto flex gap-6 px-6 py-3 overflow-x-auto">
-
+        <div
+          className={`max-w-7xl mx-auto flex-col md:flex md:flex-row gap-6 px-6 py-3 overflow-x-auto ${
+            open ? "flex" : "hidden md:flex"
+          }`}
+        >
           <Link
             href="/"
             className={`font-semibold ${
