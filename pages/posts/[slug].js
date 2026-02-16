@@ -1,5 +1,9 @@
 import Head from "next/head"
 
+useEffect(() => {
+  fetch(`/api/posts/${slug}/view`, { method: "POST" })
+}, [])
+
 export default function PostPage({ post }) {
   return (
     <>
