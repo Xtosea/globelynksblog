@@ -1,5 +1,5 @@
-import { connectDB } from '../../../lib/mongodb';
-import Post from '../../../models/Post';
+import { connectDB } from '../../lib/mongodb';
+import Post from '../../models/Post';
 import jwt from "jsonwebtoken";
 
 export default async function handler(req, res) {
