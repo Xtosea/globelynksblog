@@ -21,6 +21,7 @@
     "gray-matter": "^4.0.3",
     "intl-segmenter-polyfill": "0.4.4",
     "jsonwebtoken": "^9.0.3",
+    "lucide-react": "^0.564.0",
     "mongoose": "^9.1.6",
     "next": "15.5.9",
     "next-mdx-remote": "^6.0.0",
