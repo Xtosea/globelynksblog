@@ -18,7 +18,7 @@ export default function AdminLogin() {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ email, password }),
       });
 
       const data = await res.json();
@@ -39,14 +39,26 @@ export default function AdminLogin() {
 
   return (
     <main className="max-w-md mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-4">Admin Login</h1>
+      {/* ← Go Back + Header */}
+      <div className="flex justify-between items-center mb-6">
+        <button
+          className="bg-gray-300 hover:bg-gray-400 px-3 py-1 rounded"
+          onClick={() => router.back()}
+        >
+          ← Go Back
+        </button>
+        <h1 className="text-3xl font-bold">Publisher Dashboard</h1>
+      </div>
+
+      {/* Admin Login Form */}
+      <h2 className="text-2xl font-bold mb-4">Admin Login</h2>
 
       <form onSubmit={handleLogin} className="space-y-4">
         <input
           type="email"
           placeholder="Email"
           className="w-full border p-2 rounded"
-          onChange={e => setEmail(e.target.value)}
+          onChange={(e) => setEmail(e.target.value)}
           required
         />
 
@@ -55,13 +67,13 @@ export default function AdminLogin() {
             type={showPassword ? "text" : "password"}
             placeholder="Password"
             className="w-full border p-2 rounded"
-            onChange={e => setPassword(e.target.value)}
+            onChange={(e) => setPassword(e.target.value)}
             required
           />
           <button
             type="button"
             className="absolute right-2 top-2 text-gray-500"
-            onClick={() => setShowPassword(prev => !prev)}
+            onClick={() => setShowPassword((prev) => !prev)}
           >
             {showPassword ? "Hide" : "Show"}
           </button>
