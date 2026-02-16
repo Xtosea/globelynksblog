@@ -22,67 +22,68 @@ export default function Navbar() {
   ]
 
   return (
-  <header className="sticky top-0 z-50">
-  {/* Top Red Bar */}
-  <div className="bg-red-700 text-white text-sm py-2 px-6 relative z-50">
-    <div className="max-w-7xl mx-auto flex justify-between items-center">
-      <span className="font-bold text-lg tracking-wide">GLOBELYNKS</span>
+    <header className="sticky top-0 z-[100]">
+      {/* Top Red Bar */}
+      <div className="bg-red-700 text-white text-sm py-2 px-6 relative z-[100]">
+        <div className="max-w-7xl mx-auto flex justify-between items-center">
+          <span className="font-bold text-lg tracking-wide">GLOBELYNKS</span>
 
-      <div className="flex items-center gap-2 md:gap-3">
-        <input
-          type="text"
-          placeholder="Search news..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="flex-shrink px-2 py-1 rounded text-sm text-black w-24 sm:w-32 md:w-48 lg:w-64"
-        />
-        <button
-          onClick={toggleDark}
-          className="bg-gray-200 text-black px-2 py-1 rounded text-sm"
-        >
-          🌙
-        </button>
-        <button
-          className="md:hidden text-2xl px-2 py-1 z-50"
-          onClick={() => setOpen(!open)}
-        >
-          ☰
-        </button>
+          {/* Search, Dark Mode & Hamburger */}
+          <div className="flex items-center gap-2 md:gap-3">
+            <input
+              type="text"
+              placeholder="Search news..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="flex-shrink px-2 py-1 rounded text-sm text-black w-24 sm:w-32 md:w-48 lg:w-64"
+            />
+            <button
+              onClick={toggleDark}
+              className="bg-gray-200 text-black px-2 py-1 rounded text-sm relative z-[100]"
+            >
+              🌙
+            </button>
+            <button
+              className="md:hidden text-2xl px-2 py-1 relative z-[100]"
+              onClick={() => setOpen(!open)}
+            >
+              ☰
+            </button>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
 
-  {/* Category Menu */}
-  <nav className={`bg-white border-b relative z-50`}>
-    <div
-      className={`max-w-7xl mx-auto flex flex-col md:flex-row gap-4 md:gap-6 px-6 py-3 overflow-x-auto transition-all duration-300 ${
-        open ? "flex" : "hidden md:flex"
-      }`}
-    >
-      <Link
-        href="/"
-        className={`font-semibold ${pathname === "/" ? "text-red-600 border-b-2 border-red-600" : "text-gray-700"}`}
-      >
-        HOME
-      </Link>
-
-      {categories.map((cat) => {
-        const slug = cat.toLowerCase().replace(/\s+/g, "-")
-        const isActive = pathname === `/category/${slug}`
-        return (
+      {/* Category Menu */}
+      <nav className="bg-white border-b relative z-[100]">
+        <div
+          className={`max-w-7xl mx-auto flex flex-col md:flex-row gap-4 md:gap-6 px-6 py-3 overflow-x-auto transition-all duration-300 ${
+            open ? "flex" : "hidden md:flex"
+          }`}
+        >
           <Link
-            key={slug}
-            href={`/category/${slug}`}
-            className={`uppercase text-sm font-semibold pb-1 transition ${
-              isActive ? "text-red-600 border-b-2 border-red-600" : "text-gray-700 hover:text-red-600"
-            }`}
+            href="/"
+            className={`font-semibold ${pathname === "/" ? "text-red-600 border-b-2 border-red-600" : "text-gray-700"}`}
           >
-            {cat}
+            HOME
           </Link>
-        )
-      })}
-    </div>
-  </nav>
-</header>
+
+          {categories.map((cat) => {
+            const slug = cat.toLowerCase().replace(/\s+/g, "-")
+            const isActive = pathname === `/category/${slug}`
+            return (
+              <Link
+                key={slug}
+                href={`/category/${slug}`}
+                className={`uppercase text-sm font-semibold pb-1 transition ${
+                  isActive ? "text-red-600 border-b-2 border-red-600" : "text-gray-700 hover:text-red-600"
+                }`}
+              >
+                {cat}
+              </Link>
+            )
+          })}
+        </div>
+      </nav>
+    </header>
   )
 }
