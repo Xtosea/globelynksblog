@@ -11,10 +11,18 @@ export default function Home() {
   const [posts, setPosts] = useState([])
 
   useEffect(() => {
-    fetch("/api/posts")
-      .then(res => res.json())
-      .then(data => setPosts(data))
-      .catch(err => console.error(err))
+    const fetchPosts = () => {
+      fetch("/api/posts")
+        .then(res => res.json())
+        .then(data => setPosts(data))
+        .catch(err => console.error("Failed to fetch posts:", err))
+    }
+
+    fetchPosts() // initial fetch
+
+    const interval = setInterval(fetchPosts, 30000) // refresh every 30s
+
+    return () => clearInterval(interval) // cleanup on unmount
   }, [])
 
   return (
@@ -23,9 +31,8 @@ export default function Home() {
       <StickyShare />
 
       <main className="max-w-7xl mx-auto px-6 py-10 grid md:grid-cols-4 gap-10">
-
+        {/* Main content */}
         <div className="md:col-span-3 space-y-10">
-
           {posts[0] && (
             <div>
               <Link href={`/posts/${posts[0].slug}`}>
@@ -63,14 +70,13 @@ export default function Home() {
               </p>
             </div>
           ))}
-
         </div>
 
+        {/* Sidebar */}
         <div className="space-y-6">
           <TrendingSidebar posts={posts} />
           <AdBlock />
         </div>
-
       </main>
     </>
   )
