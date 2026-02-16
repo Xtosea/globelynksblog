@@ -22,13 +22,13 @@ export default function Navbar() {
   ]
 
   return (
-    <header className="sticky top-0 z-[100]">
+    <header className="sticky top-0 z-[200]"> {/* high z-index */}
       {/* Top Red Bar */}
-      <div className="bg-red-700 text-white text-sm py-2 px-6 relative z-[100]">
+      <div className="bg-red-700 text-white text-sm py-2 px-6 relative z-[200]">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <span className="font-bold text-lg tracking-wide">GLOBELYNKS</span>
 
-          {/* Search, Dark Mode & Hamburger */}
+          {/* Search + Dark + Hamburger */}
           <div className="flex items-center gap-2 md:gap-3">
             <input
               type="text"
@@ -39,12 +39,12 @@ export default function Navbar() {
             />
             <button
               onClick={toggleDark}
-              className="bg-gray-200 text-black px-2 py-1 rounded text-sm relative z-[100]"
+              className="bg-gray-200 text-black px-2 py-1 rounded text-sm z-[300]"
             >
               🌙
             </button>
             <button
-              className="md:hidden text-2xl px-2 py-1 relative z-[100]"
+              className="md:hidden text-2xl px-2 py-1 z-[300]"
               onClick={() => setOpen(!open)}
             >
               ☰
@@ -54,7 +54,7 @@ export default function Navbar() {
       </div>
 
       {/* Category Menu */}
-      <nav className="bg-white border-b relative z-[100]">
+      <nav className={`bg-white border-b relative z-[200]`}>
         <div
           className={`max-w-7xl mx-auto flex flex-col md:flex-row gap-4 md:gap-6 px-6 py-3 overflow-x-auto transition-all duration-300 ${
             open ? "flex" : "hidden md:flex"
