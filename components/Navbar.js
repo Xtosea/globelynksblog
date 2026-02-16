@@ -16,11 +16,10 @@ export default function Navbar() {
     "education",
     "international",
     "health",
-    "Interview",
-    "NEWS BULLETINS",
-    "Wedding",
-    "Education",
-    "Ceremonies",
+    "interview",
+    "news bulletins",
+    "wedding",
+    "ceremonies",
   ]
 
   return (
@@ -38,23 +37,26 @@ export default function Navbar() {
       {/* 📰 Category Navigation */}
       <nav className="bg-white border-b sticky top-0 z-50">
         <div className="max-w-7xl mx-auto flex gap-6 px-6 py-3 overflow-x-auto">
-
+          
           <Link
             href="/"
             className={`font-semibold ${
-              pathname === "/" ? "text-red-600 border-b-2 border-red-600" : "text-gray-700"
+              pathname === "/"
+                ? "text-red-600 border-b-2 border-red-600"
+                : "text-gray-700"
             }`}
           >
             HOME
           </Link>
 
           {categories.map((cat) => {
-            const isActive = pathname === `/category/${cat}`
+            const slug = cat.toLowerCase().replace(/\s+/g, "-")
+            const isActive = pathname === `/category/${slug}`
 
             return (
               <Link
-                key={cat}
-                href={`/category/${cat}`}
+                key={slug}
+                href={`/category/${slug}`}
                 className={`uppercase text-sm font-semibold pb-1 transition ${
                   isActive
                     ? "text-red-600 border-b-2 border-red-600"
