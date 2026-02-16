@@ -1,4 +1,3 @@
-// pages/index.js
 "use client"
 
 import { useEffect, useState } from "react"
@@ -28,7 +27,7 @@ export default function Home() {
 
   return (
     <>
-      <Navbar />   {/* manually added */}
+      <Navbar />  
       <BreakingTicker posts={posts} />
       <StickyShare />
       <main className="max-w-7xl mx-auto px-6 py-10 grid md:grid-cols-4 gap-10">
@@ -57,7 +56,7 @@ export default function Home() {
           <AdBlock />
         </div>
       </main>
-      <Footer />   {/* manually added */}
+      <Footer />
     </>
   )
 }
