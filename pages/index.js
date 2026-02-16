@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
+import navbar from./components/navbar
 
 export default function Home() {
   const [posts, setPosts] = useState([])
