@@ -23,7 +23,7 @@
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.1.6",
     "next": "15.5.9",
-    "next-mdx-remote": "^5.0.0",
+    "next-mdx-remote": "^6.0.0",
     "react": "19.2.1",
     "react-dom": "19.2.1",
     "styled-components": "6.1.19"
