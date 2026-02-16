@@ -1,13 +1,25 @@
+"use client"
+
+import { useEffect, useState } from "react"
 import Head from "next/head"
 
-useEffect(() => {
-  if (!slug) return
-
-  fetch(`/api/posts/${slug}/view`, { method: "POST" })
-    .catch(err => console.error("Failed to increment view:", err))
-}, [slug])
-
 export default function PostPage({ post }) {
+  // State to hold live view count
+  const [views, setViews] = useState(post.views || 0)
+  const slug = post.slug
+
+  // Increment views on page load
+  useEffect(() => {
+    if (!slug) return
+
+    fetch(`/api/posts/${slug}/view`, { method: "POST" })
+      .then(res => res.json())
+      .then(data => {
+        if (data.views !== undefined) setViews(data.views)
+      })
+      .catch(err => console.error("Failed to increment view:", err))
+  }, [slug])
+
   return (
     <>
       <Head>
@@ -19,7 +31,10 @@ export default function PostPage({ post }) {
         <meta property="og:title" content={post.title} />
         <meta property="og:description" content={post.excerpt} />
         <meta property="og:image" content={post.image} />
-        <meta property="og:url" content={`https://trendingnews.globelynks.com/posts/${post.slug}`} />
+        <meta
+          property="og:url"
+          content={`https://trendingnews.globelynks.com/posts/${post.slug}`}
+        />
         <meta property="og:site_name" content="Globelynks News" />
 
         {/* Twitter */}
@@ -30,9 +45,12 @@ export default function PostPage({ post }) {
       <article className="max-w-3xl mx-auto px-6 py-10">
         <h1 className="text-4xl font-bold mb-2">{post.title}</h1>
 
-        <p className="text-sm text-gray-500 mb-6">
+        <p className="text-sm text-gray-500 mb-2">
           {post.author} · {new Date(post.publishedAt).toDateString()}
         </p>
+
+        {/* Views */}
+        <p className="text-sm text-gray-500 mb-6">👁 {views} views</p>
 
         {post.image && (
           <img src={post.image} alt={post.title} className="w-full rounded-xl mb-8" />
