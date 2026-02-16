@@ -24,7 +24,7 @@ export default function AdminLogin() {
 
       if (res.ok) {
         localStorage.setItem("token", data.token);
-        router.push("/publisher") // Pages Router
+        router.push("/admin/dashboard") // Pages Router
       } else {
         alert(data.message || "Login failed");
       }
