@@ -1,6 +1,6 @@
 // pages/api/seed-admin.js
-import dbConnect from "../../lib/mongodb"; // adjust path if needed
-import User from "../../models/User";
+import dbConnect from "../../../lib/mongodb"; // adjust path if needed
+import User from "../../../models/User";
 import bcrypt from "bcryptjs";
 
 export default async function handler(req, res) {
