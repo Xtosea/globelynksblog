@@ -7,12 +7,10 @@ import { usePathname } from "next/navigation"
 export default function Navbar() {
   const pathname = usePathname()
   const [search, setSearch] = useState("")
-  const [open, setOpen] = useState(false) // ✅ Hamburger state
+  const [open, setOpen] = useState(false)
 
   const toggleDark = () => {
-    if (typeof window !== "undefined") {
-      document.documentElement.classList.toggle("dark")
-    }
+    document.documentElement.classList.toggle("dark")
   }
 
   const categories = [
@@ -33,13 +31,10 @@ export default function Navbar() {
 
   return (
     <>
-      {/* 🔴 Top Red Header */}
       <div className="bg-red-700 text-white text-sm py-2 px-6">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <span className="font-bold text-lg tracking-wide">GLOBELYNKS</span>
-
           <div className="flex items-center gap-3">
-            {/* 🔎 Search */}
             <input
               type="text"
               placeholder="Search news..."
@@ -47,58 +42,25 @@ export default function Navbar() {
               onChange={(e) => setSearch(e.target.value)}
               className="border px-3 py-1 rounded text-sm text-black"
             />
-
-            {/* 🌙 Dark Mode */}
             <button
               onClick={toggleDark}
               className="bg-gray-200 text-black px-3 py-1 rounded"
             >
               🌙
             </button>
-
-            {/* ☰ Hamburger (mobile only) */}
-            <button
-              className="md:hidden text-2xl px-3 py-1"
-              onClick={() => setOpen(!open)}
-            >
-              ☰
-            </button>
+            <button className="md:hidden text-2xl px-3 py-1" onClick={() => setOpen(!open)}>☰</button>
           </div>
         </div>
       </div>
 
-      {/* 📰 Category Navigation */}
       <nav className="bg-white border-b sticky top-0 z-50">
-        <div
-          className={`max-w-7xl mx-auto flex-col md:flex md:flex-row gap-6 px-6 py-3 overflow-x-auto ${
-            open ? "flex" : "hidden md:flex"
-          }`}
-        >
-          <Link
-            href="/"
-            className={`font-semibold ${
-              pathname === "/"
-                ? "text-red-600 border-b-2 border-red-600"
-                : "text-gray-700"
-            }`}
-          >
-            HOME
-          </Link>
-
-          {categories.map((cat) => {
+        <div className={`max-w-7xl mx-auto flex-col md:flex md:flex-row gap-6 px-6 py-3 overflow-x-auto ${open ? "flex" : "hidden md:flex"}`}>
+          <Link href="/" className={`font-semibold ${pathname === "/" ? "text-red-600 border-b-2 border-red-600" : "text-gray-700"}`}>HOME</Link>
+          {categories.map(cat => {
             const slug = cat.toLowerCase().replace(/\s+/g, "-")
             const isActive = pathname === `/category/${slug}`
-
             return (
-              <Link
-                key={slug}
-                href={`/category/${slug}`}
-                className={`uppercase text-sm font-semibold pb-1 transition ${
-                  isActive
-                    ? "text-red-600 border-b-2 border-red-600"
-                    : "text-gray-700 hover:text-red-600"
-                }`}
-              >
+              <Link key={slug} href={`/category/${slug}`} className={`uppercase text-sm font-semibold pb-1 transition ${isActive ? "text-red-600 border-b-2 border-red-600" : "text-gray-700 hover:text-red-600"}`}>
                 {cat}
               </Link>
             )
