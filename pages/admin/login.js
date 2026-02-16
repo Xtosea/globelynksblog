@@ -1,17 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/router"; // app router
+import { useRouter } from "next/router";
 
 export default function AdminLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false); // <-- new
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   async function handleLogin(e) {
     e.preventDefault();
-    setLoading(true); // start spinner
+    setLoading(true);
 
     try {
       const res = await fetch("/api/auth/login", {
@@ -24,7 +25,7 @@ export default function AdminLogin() {
 
       if (res.ok) {
         localStorage.setItem("token", data.token);
-        router.push("/admin/dashboard") // Pages Router
+        router.push("/admin/dashboard");
       } else {
         alert(data.message || "Login failed");
       }
@@ -32,7 +33,7 @@ export default function AdminLogin() {
       console.error(err);
       alert("Server error. Check console.");
     } finally {
-      setLoading(false); // stop spinner
+      setLoading(false);
     }
   }
 
@@ -49,13 +50,22 @@ export default function AdminLogin() {
           required
         />
 
-        <input
-          type="password"
-          placeholder="Password"
-          className="w-full border p-2 rounded"
-          onChange={e => setPassword(e.target.value)}
-          required
-        />
+        <div className="relative">
+          <input
+            type={showPassword ? "text" : "password"}
+            placeholder="Password"
+            className="w-full border p-2 rounded"
+            onChange={e => setPassword(e.target.value)}
+            required
+          />
+          <button
+            type="button"
+            className="absolute right-2 top-2 text-gray-500"
+            onClick={() => setShowPassword(prev => !prev)}
+          >
+            {showPassword ? "Hide" : "Show"}
+          </button>
+        </div>
 
         <button
           type="submit"
