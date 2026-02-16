@@ -1,8 +1,11 @@
 import Head from "next/head"
 
 useEffect(() => {
+  if (!slug) return
+
   fetch(`/api/posts/${slug}/view`, { method: "POST" })
-}, [])
+    .catch(err => console.error("Failed to increment view:", err))
+}, [slug])
 
 export default function PostPage({ post }) {
   return (
