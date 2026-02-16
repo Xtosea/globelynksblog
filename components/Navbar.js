@@ -34,6 +34,13 @@ export default function Navbar() {
         </div>
       </div>
 
+   <button
+  onClick={toggleDark}
+  className="ml-auto bg-gray-200 dark:bg-gray-700 px-3 py-1 rounded"
+>
+  🌙
+</button>
+
       {/* 📰 Category Navigation */}
       <nav className="bg-white border-b sticky top-0 z-50">
         <div className="max-w-7xl mx-auto flex gap-6 px-6 py-3 overflow-x-auto">
