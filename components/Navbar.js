@@ -33,6 +33,12 @@ export default function Navbar() {
           <span>News & Entertainment</span>
         </div>
       </div>
+   
+    <input
+  type="text"
+  placeholder="Search news..."
+  className="border px-3 py-1 rounded text-sm dark:bg-gray-800"
+/>
 
    <button
   onClick={toggleDark}
