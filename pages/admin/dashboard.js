@@ -9,25 +9,34 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (!token) {
-      router.push("/admin/login");
-      return;
-    }
+    if (!token) return router.push("/admin/login");
 
-    // Optional: decode JWT to show admin info
-    const payload = JSON.parse(atob(token.split(".")[1]));
-    if (payload.role !== "admin") {
+    try {
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      if (payload.role !== "admin") return router.push("/admin/login");
+      setUser(payload);
+    } catch {
       router.push("/admin/login");
-      return;
     }
-
-    setUser(payload);
   }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    router.push("/admin/login");
+  };
 
   return (
     <main className="min-h-screen bg-gray-100 px-6 py-10">
       <div className="max-w-4xl mx-auto bg-white p-8 rounded-xl shadow">
-        <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+          <button
+            onClick={handleLogout}
+            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
+          >
+            Logout
+          </button>
+        </div>
 
         {user && (
           <p className="mb-4">
