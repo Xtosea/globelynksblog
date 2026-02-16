@@ -9,7 +9,7 @@ export default async function handler(req, res) {
 
   // ===========================
   // GET SINGLE POST
-  // ==============================
+  // =============================
   if (req.method === "GET") {
     try {
       const post = await Post.findById(id);
