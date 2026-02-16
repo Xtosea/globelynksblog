@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import BreakingTicker from "./components/BreakingTicker"
-import TrendingSidebar from "./components/TrendingSidebar"
-import AdBlock from "./components/AdBlock"
-import StickyShare from "./components/StickyShare"
+import BreakingTicker from "../components/BreakingTicker"
+import TrendingSidebar from "../components/TrendingSidebar"
+import AdBlock from "../components/AdBlock"
+import StickyShare from "../components/StickyShare"
 
 export default function Home() {
   const [posts, setPosts] = useState([])
