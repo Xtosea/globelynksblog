@@ -6,6 +6,8 @@ import BreakingTicker from "../components/BreakingTicker"
 import TrendingSidebar from "../components/TrendingSidebar"
 import AdBlock from "../components/AdBlock"
 import StickyShare from "../components/StickyShare"
+import Navbar from "../components/Navbar"
+import Footer from "../components/Footer"
 
 export default function Home() {
   const [posts, setPosts] = useState([])
