@@ -2,11 +2,10 @@
 
 import { useState } from "react"
 import Link from "next/link"
-
 import { usePathname } from "next/navigation"
 
 export default function Navbar() {
-  const router = useRouter()
+  const pathname = usePathname() // ✅ correct hook
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState("")
 
@@ -75,7 +74,7 @@ export default function Navbar() {
           <Link
             href="/"
             className={`font-semibold ${
-              router.pathname === "/" ? "text-red-600 border-b-2 border-red-600" : "text-gray-700"
+              pathname === "/" ? "text-red-600 border-b-2 border-red-600" : "text-gray-700"
             }`}
           >
             HOME
@@ -84,7 +83,7 @@ export default function Navbar() {
           {/* Category Links */}
           {categories.map((cat) => {
             const slug = cat.toLowerCase().replace(/\s+/g, "-")
-            const isActive = router.pathname === `/category/${slug}`
+            const isActive = pathname === `/category/${slug}`
             return (
               <Link
                 key={slug}
