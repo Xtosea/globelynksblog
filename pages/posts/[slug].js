@@ -4,11 +4,11 @@ import { useEffect, useState } from "react"
 import Head from "next/head"
 
 export default function PostPage({ post }) {
-  // State to hold live view count
-  const [views, setViews] = useState(post.views || 0)
   const slug = post.slug
 
-  // Increment views on page load
+  // --- Views state ---
+  const [views, setViews] = useState(post.views || 0)
+
   useEffect(() => {
     if (!slug) return
 
@@ -19,6 +19,41 @@ export default function PostPage({ post }) {
       })
       .catch(err => console.error("Failed to increment view:", err))
   }, [slug])
+
+  // --- Comments state ---
+  const [comments, setComments] = useState([])
+  const [name, setName] = useState("")
+  const [message, setMessage] = useState("")
+
+  // Fetch comments on load
+  useEffect(() => {
+    if (!slug) return
+
+    fetch(`/api/comments?slug=${slug}`)
+      .then(res => res.json())
+      .then(data => setComments(data))
+      .catch(err => console.error("Failed to fetch comments:", err))
+  }, [slug])
+
+  // Submit new comment
+  const submitComment = async () => {
+    if (!name || !message) return alert("Please enter your name and message")
+
+    const res = await fetch("/api/comments", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ postSlug: slug, name, message }),
+    })
+
+    if (res.ok) {
+      const newComment = await res.json()
+      setComments(prev => [...prev, newComment])
+      setName("")
+      setMessage("")
+    } else {
+      alert("Failed to post comment")
+    }
+  }
 
   return (
     <>
@@ -50,14 +85,49 @@ export default function PostPage({ post }) {
         </p>
 
         {/* Views */}
-        <p className="text-sm text-gray-500 mb-6">👁 {views} views</p>
+        <p className="text-sm text-gray-500 mb-6">👁 {views.toLocaleString()} views</p>
 
         {post.image && (
           <img src={post.image} alt={post.title} className="w-full rounded-xl mb-8" />
         )}
 
-        <div className="prose prose-lg max-w-none whitespace-pre-line">
+        <div className="prose prose-lg max-w-none whitespace-pre-line mb-10">
           {post.content}
+        </div>
+
+        {/* --- Comments Section --- */}
+        <div className="mt-10">
+          <h3 className="font-bold mb-4">Comments</h3>
+
+          <input
+            placeholder="Your name"
+            value={name}
+            onChange={e => setName(e.target.value)}
+            className="border p-2 w-full mb-2"
+          />
+
+          <textarea
+            placeholder="Write comment..."
+            value={message}
+            onChange={e => setMessage(e.target.value)}
+            className="border p-2 w-full mb-2"
+          />
+
+          <button
+            onClick={submitComment}
+            className="bg-red-600 text-white px-4 py-2 rounded"
+          >
+            Post Comment
+          </button>
+
+          <div className="mt-6 space-y-4">
+            {comments.map(c => (
+              <div key={c._id} className="border-b pb-2">
+                <p className="font-semibold">{c.name}</p>
+                <p className="text-sm text-gray-600">{c.message}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </article>
     </>
