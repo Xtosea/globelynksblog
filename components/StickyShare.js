@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { Facebook, Twitter, MessageCircle } from "lucide-react"
 
 export default function StickyShare() {
   const [pageUrl, setPageUrl] = useState("")
@@ -13,44 +14,49 @@ export default function StickyShare() {
     }
   }, [])
 
-  if (!pageUrl) return null // Prevent rendering until ready
+  if (!pageUrl) return null
+
+  const shares = [
+    {
+      name: "Facebook",
+      url: `https://www.facebook.com/sharer/sharer.php?u=${pageUrl}`,
+      icon: <Facebook size={18} />,
+      bg: "bg-blue-600 hover:bg-blue-700"
+    },
+    {
+      name: "Twitter",
+      url: `https://twitter.com/intent/tweet?url=${pageUrl}&text=${pageTitle}`,
+      icon: <Twitter size={18} />,
+      bg: "bg-sky-500 hover:bg-sky-600"
+    },
+    {
+      name: "WhatsApp",
+      url: `https://api.whatsapp.com/send?text=${pageTitle}%20${pageUrl}`,
+      icon: <MessageCircle size={18} />,
+      bg: "bg-green-600 hover:bg-green-700"
+    }
+  ]
 
   return (
-    <div className="fixed left-2 top-1/3 flex flex-col gap-3 z-50">
-      
-      {/* Facebook */}
-      <a
-        href={`https://www.facebook.com/sharer/sharer.php?u=${pageUrl}`}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded flex items-center justify-center transition"
-        title="Share on Facebook"
-      >
-        {/* SVG */}
-      </a>
+    <div className="fixed left-0 top-1/3 flex flex-col z-50">
+      {shares.map((item, i) => (
+        <a
+          key={i}
+          href={item.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={`group flex items-center ${item.bg} text-white transition-all duration-300`}
+        >
+          <div className="p-3">
+            {item.icon}
+          </div>
 
-      {/* Twitter */}
-      <a
-        href={`https://twitter.com/intent/tweet?url=${pageUrl}&text=${pageTitle}`}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="bg-sky-500 hover:bg-sky-600 text-white p-3 rounded flex items-center justify-center transition"
-        title="Share on Twitter"
-      >
-        {/* SVG */}
-      </a>
-
-      {/* WhatsApp */}
-      <a
-        href={`https://api.whatsapp.com/send?text=${pageTitle}%20${pageUrl}`}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="bg-green-600 hover:bg-green-700 text-white p-3 rounded flex items-center justify-center transition"
-        title="Share on WhatsApp"
-      >
-        {/* SVG */}
-      </a>
-
+          {/* Slide-out label */}
+          <span className="max-w-0 overflow-hidden group-hover:max-w-xs group-hover:px-3 whitespace-nowrap transition-all duration-300">
+            {item.name}
+          </span>
+        </a>
+      ))}
     </div>
   )
 }
