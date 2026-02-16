@@ -1,3 +1,5 @@
+"use client"
+
 export default function StickyShare() {
   return (
     <div className="fixed left-2 top-1/3 flex flex-col gap-3 z-50">
