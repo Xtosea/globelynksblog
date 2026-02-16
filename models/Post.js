@@ -14,5 +14,10 @@ const PostSchema = new mongoose.Schema({
   }
 })
 
+views: {
+  type: Number,
+  default: 0
+}
+
 export default mongoose.models.Post ||
   mongoose.model("Post", PostSchema)
