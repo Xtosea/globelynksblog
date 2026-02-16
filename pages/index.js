@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-
-
+import BreakingTicker from "./components/BreakingTicker"
+import TrendingSidebar from "./components/TrendingSidebar"
+import AdBlock from "./components/AdBlock"
+import StickyShare from "./components/StickyShare"
 
 export default function Home() {
   const [posts, setPosts] = useState([])
@@ -16,57 +18,60 @@ export default function Home() {
   }, [])
 
   return (
-    <main className="min-h-screen bg-gray-50 px-6 py-10">
-      <div className="max-w-4xl mx-auto">
+    <>
+      <BreakingTicker posts={posts} />
+      <StickyShare />
 
-        {/* Blog Header */}
-        <h1 className="text-4xl font-bold mb-2">Globelynks Blog</h1>
-        <p className="text-gray-600 mb-6">Fresh ideas, stories, and updates.</p>
+      <main className="max-w-7xl mx-auto px-6 py-10 grid md:grid-cols-4 gap-10">
 
-        {/* Category Navigation */}
-        <div className="flex gap-4 mb-10 flex-wrap">
-          {["breaking", "politics", "business", "tech", "sports", "Entertainment", "Education", "Wedding", "International/World", "Health & Science",  "News Bulletins/Alerts", "Interviews/Profiles", "Ceremonies"].map(cat => (
-            <Link
-              key={cat}
-              href={`/category/${cat}`}
-              className="text-sm font-medium text-blue-600 hover:underline"
-            >
-              {cat.toUpperCase()}
-            </Link>
-          ))}
-        </div>
+        <div className="md:col-span-3 space-y-10">
 
-        {/* Blog Posts */}
-        <div className="space-y-8">
-          {posts.map(post => (
-            <div key={post._id} className="bg-white p-6 rounded-xl shadow hover:shadow-lg transition">
-              <h2 className="text-2xl font-semibold mb-2">
-                <Link href={`/posts/${post.slug}`} className="hover:underline">
-                  {post.title}
-                </Link>
-              </h2>
+          {posts[0] && (
+            <div>
+              <Link href={`/posts/${posts[0].slug}`}>
+                <h1 className="text-4xl md:text-5xl font-extrabold mb-4 hover:text-red-600">
+                  {posts[0].title}
+                </h1>
+              </Link>
 
-              <p className="text-gray-500 text-sm mb-3">
-                {post.author} ·{" "}
-                {post.publishedAt
-                  ? new Date(post.publishedAt).toDateString()
-                  : "Unknown date"}
-              </p>
-
-              <p className="text-gray-700">{post.excerpt}</p>
-
-              {post.image && (
+              {posts[0].image && (
                 <img
-                  src={post.image}
-                  alt={post.title}
-                  className="w-full h-64 object-cover rounded mt-4"
+                  src={posts[0].image}
+                  alt={posts[0].title}
+                  className="w-full h-[400px] object-cover rounded"
                 />
               )}
+
+              <p className="mt-4 text-gray-600 dark:text-gray-300 text-lg">
+                {posts[0].excerpt}
+              </p>
+            </div>
+          )}
+
+          <AdBlock />
+
+          {posts.slice(1).map(post => (
+            <div key={post._id} className="border-b pb-6">
+              <Link href={`/posts/${post.slug}`}>
+                <h2 className="text-xl font-bold hover:text-red-600">
+                  {post.title}
+                </h2>
+              </Link>
+
+              <p className="text-gray-600 dark:text-gray-400 text-sm mt-2">
+                {post.excerpt}
+              </p>
             </div>
           ))}
+
         </div>
 
-      </div>
-    </main>
+        <div className="space-y-6">
+          <TrendingSidebar posts={posts} />
+          <AdBlock />
+        </div>
+
+      </main>
+    </>
   )
 }
