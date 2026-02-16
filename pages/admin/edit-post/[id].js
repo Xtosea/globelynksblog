@@ -1,17 +1,19 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter } from "next/router";
 
 export default function EditPost() {
   const router = useRouter();
-  const { id } = useParams();
+  const { id } = router.query;
+
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  // Fetch post by ID
   useEffect(() => {
+    if (!id) return; // Important: wait until id exists
+
     const fetchPost = async () => {
       try {
         const res = await fetch(`/api/posts/${id}`);
@@ -24,6 +26,7 @@ export default function EditPost() {
         setLoading(false);
       }
     };
+
     fetchPost();
   }, [id]);
 
@@ -40,21 +43,27 @@ export default function EditPost() {
     try {
       const res = await fetch(`/api/posts/${id}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify(post),
       });
+
       const data = await res.json();
       if (!res.ok) return alert(data.message || "Failed to save post");
+
       alert("Post updated successfully!");
       router.push("/admin/posts");
     } catch (err) {
       console.error(err);
-      alert("Server error. Check console.");
+      alert("Server error.");
     } finally {
       setSaving(false);
     }
   };
 
+  if (!id) return null; // Prevent prerender crash
   if (loading) return <p className="px-6 py-10">Loading post...</p>;
   if (!post) return <p className="px-6 py-10">Post not found.</p>;
 
@@ -67,37 +76,22 @@ export default function EditPost() {
           <input
             name="title"
             value={post.title}
-            placeholder="News Title"
             className="w-full border p-3 rounded"
             onChange={handleChange}
           />
-          <select name="category" value={post.category} className="w-full border p-3 rounded" onChange={handleChange}>
-            <option value="breaking">Breaking</option>
-            <option value="politics">Politics</option>
-            <option value="business">Business</option>
-            <option value="tech">Tech</option>
-            <option value="sports">Sports</option>
-          </select>
-          <textarea
-            name="excerpt"
-            value={post.excerpt}
-            placeholder="Short excerpt"
-            rows="3"
-            className="w-full border p-3 rounded"
-            onChange={handleChange}
-          />
+
           <textarea
             name="content"
             value={post.content}
-            placeholder="Full article content"
             rows="8"
             className="w-full border p-3 rounded"
             onChange={handleChange}
           />
+
           <button
             type="submit"
             disabled={saving}
-            className={`bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded font-semibold ${saving ? "opacity-50 cursor-not-allowed" : ""}`}
+            className="bg-blue-600 text-white px-6 py-3 rounded"
           >
             {saving ? "Saving..." : "Save Changes"}
           </button>
