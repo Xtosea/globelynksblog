@@ -4,28 +4,30 @@ const parser = new Parser();
 
 export default async function handler(req, res) {
   const feeds = [
-    "https://feeds.bbci.co.uk/news/politics/rss.xml",
-    "https://www.reutersagency.com/feed/?best-topics=politics",
-    // Add more feeds here
+    { url: "https://feeds.bbci.co.uk/news/politics/rss.xml", category: "Politics" },
+    { url: "https://www.reutersagency.com/feed/?best-topics=technology", category: "Tech" },
+    { url: "https://feeds.bbci.co.uk/news/world/rss.xml", category: "International" },
+    { url: "https://feeds.bbci.co.uk/news/entertainment_and_arts/rss.xml", category: "Entertainment" },
   ];
 
   try {
     let allItems = [];
 
-    for (let feedUrl of feeds) {
-      const feed = await parser.parseURL(feedUrl);
+    for (let feedObj of feeds) {
+      const feed = await parser.parseURL(feedObj.url);
       const items = feed.items.map(item => ({
         title: item.title,
         link: item.link,
         pubDate: item.pubDate,
         source: feed.title,
         snippet: item.contentSnippet,
+        category: feedObj.category,
       }));
 
       allItems = allItems.concat(items);
     }
 
-    // Sort by latest
+    // Sort by most recent
     allItems.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
 
     res.status(200).json({ news: allItems });
