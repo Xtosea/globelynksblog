@@ -13,49 +13,82 @@ export default function Home() {
   const [posts, setPosts] = useState([])
 
   useEffect(() => {
-    const fetchPosts = () => {
-      fetch("/api/posts")
-        .then(res => res.json())
-        .then(data => setPosts(data))
-        .catch(err => console.error(err))
+    const fetchPosts = async () => {
+      try {
+        // Fetch breaking-news published articles
+        const res = await fetch("/api/articles/trending")
+        const data = await res.json()
+        const articles = data.topArticles || []
+
+        // Optional: fetch old posts if needed
+        // const oldRes = await fetch("/api/posts")
+        // const oldPosts = await oldRes.json()
+
+        // Merge arrays (breaking-news first)
+        // const mergedPosts = [...articles, ...oldPosts]
+        // mergedPosts.sort((a, b) => new Date(b.scheduledDate || b.createdAt) - new Date(a.scheduledDate || a.createdAt))
+
+        setPosts(articles) // or setPosts(mergedPosts) if merging
+      } catch (err) {
+        console.error(err)
+      }
     }
 
     fetchPosts()
-    const interval = setInterval(fetchPosts, 30000)
+    const interval = setInterval(fetchPosts, 30000) // refresh every 30s
     return () => clearInterval(interval)
   }, [])
 
   return (
     <>
-      <Navbar />  
+      <Navbar />
       <BreakingTicker posts={posts} />
       <StickyShare />
+
       <main className="max-w-7xl mx-auto px-6 py-10 grid md:grid-cols-4 gap-10">
+        {/* Main Content */}
         <div className="md:col-span-3 space-y-10">
           {posts[0] && (
             <div>
-              <Link href={`/posts/${posts[0].slug}`}>
-                <h1 className="text-4xl md:text-5xl font-extrabold mb-4 hover:text-red-600">{posts[0].title}</h1>
+              <Link href={`/articles/${posts[0]._id}`}>
+                <h1 className="text-4xl md:text-5xl font-extrabold mb-4 hover:text-red-600">
+                  {posts[0].title}
+                </h1>
               </Link>
-              {posts[0].image && <img src={posts[0].image} alt={posts[0].title} className="w-full h-[400px] object-cover rounded" />}
-              <p className="mt-4 text-gray-600 dark:text-gray-300 text-lg">{posts[0].excerpt}</p>
+              {posts[0].image && (
+                <img
+                  src={posts[0].image}
+                  alt={posts[0].title}
+                  className="w-full h-[400px] object-cover rounded"
+                />
+              )}
+              <p className="mt-4 text-gray-600 dark:text-gray-300 text-lg">
+                {posts[0].content.slice(0, 200)}...
+              </p>
             </div>
           )}
+
           <AdBlock />
+
           {posts.slice(1).map(post => (
             <div key={post._id} className="border-b pb-6">
-              <Link href={`/posts/${post.slug}`}>
+              <Link href={`/articles/${post._id}`}>
                 <h2 className="text-xl font-bold hover:text-red-600">{post.title}</h2>
               </Link>
-              <p className="text-gray-600 dark:text-gray-400 text-sm mt-2">{post.excerpt}</p>
+              <p className="text-gray-600 dark:text-gray-400 text-sm mt-2">
+                {post.content.slice(0, 120)}...
+              </p>
             </div>
           ))}
         </div>
+
+        {/* Sidebar */}
         <div className="space-y-6">
           <TrendingSidebar posts={posts} />
           <AdBlock />
         </div>
       </main>
+
       <Footer />
     </>
   )
