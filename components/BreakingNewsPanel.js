@@ -22,7 +22,7 @@ export default function BreakingNewsPanel({ onSelect }) {
 
   return (
     <div>
-      <h2>Suggested Breaking News</h2>
+      <h2>Breaking News Suggestions</h2>
       <ul>
         {news.map((item, i) => (
           <li key={i} className="mb-4 border-b pb-2">
