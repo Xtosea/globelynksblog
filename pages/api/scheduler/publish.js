@@ -1,5 +1,5 @@
 import cron from "node-cron";
-import dbConnect from "@/lib/mongodb";
+import { connectDB } from '@/lib/mongodb';
 import Article from "@/models/Article";
 
 // Runs every minute
