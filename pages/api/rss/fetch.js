@@ -4,8 +4,9 @@ const parser = new Parser();
 
 export default async function handler(req, res) {
   const feeds = [
-    "https://www.reutersagency.com/feed/?best-topics=politics", // example
     "https://feeds.bbci.co.uk/news/politics/rss.xml",
+    "https://www.reutersagency.com/feed/?best-topics=politics",
+    // Add more feeds here
   ];
 
   try {
@@ -24,7 +25,7 @@ export default async function handler(req, res) {
       allItems = allItems.concat(items);
     }
 
-    // Sort by most recent
+    // Sort by latest
     allItems.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
 
     res.status(200).json({ news: allItems });
