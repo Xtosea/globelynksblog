@@ -13,26 +13,23 @@ export default async function handler(req, res) {
   try {
     let allItems = [];
 
-    for (let feedObj of feeds) {
-      const feed = await parser.parseURL(feedObj.url);
+    for (let f of feeds) {
+      const feed = await parser.parseURL(f.url);
       const items = feed.items.map(item => ({
         title: item.title,
         link: item.link,
         pubDate: item.pubDate,
         source: feed.title,
         snippet: item.contentSnippet,
-        category: feedObj.category,
+        category: f.category,
       }));
-
       allItems = allItems.concat(items);
     }
 
-    // Sort by most recent
     allItems.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
-
     res.status(200).json({ news: allItems });
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Failed to fetch RSS feeds" });
   }
 }
