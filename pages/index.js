@@ -15,22 +15,25 @@ export default function Home() {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        // Fetch breaking-news published articles
-        const res = await fetch("/api/articles/trending")
-        const data = await res.json()
-        const articles = data.topArticles || []
+        // 1️⃣ Fetch trending/breaking articles
+        const trendingRes = await fetch("/api/articles/trending")
+        const trendingData = await trendingRes.json()
+        const trendingArticles = trendingData.topArticles || []
 
-        // Optional: fetch old posts if needed
-        // const oldRes = await fetch("/api/posts")
-        // const oldPosts = await oldRes.json()
+        // 2️⃣ Fetch old posts
+        const oldRes = await fetch("/api/posts")
+        const oldPosts = await oldRes.json()
 
-        // Merge arrays (breaking-news first)
-        // const mergedPosts = [...articles, ...oldPosts]
-        // mergedPosts.sort((a, b) => new Date(b.scheduledDate || b.createdAt) - new Date(a.scheduledDate || a.createdAt))
+        // 3️⃣ Merge and sort (newest first)
+        const mergedPosts = [...trendingArticles, ...oldPosts].sort(
+          (a, b) =>
+            new Date(b.scheduledDate ?? b.createdAt) -
+            new Date(a.scheduledDate ?? a.createdAt)
+        )
 
-        setPosts(articles) // or setPosts(mergedPosts) if merging
+        setPosts(mergedPosts)
       } catch (err) {
-        console.error(err)
+        console.error("Error fetching posts:", err)
       }
     }
 
@@ -48,45 +51,49 @@ export default function Home() {
       <main className="max-w-7xl mx-auto px-6 py-10 grid md:grid-cols-4 gap-10">
         {/* Main Content */}
         <div className="md:col-span-3 space-y-10">
+          {/* Featured post */}
           {posts[0] && (
             <div>
-              <Link href={`/articles/${posts[0]._id}`}>
+              <Link href={`/articles/${posts[0]?._id ?? "#"}`}>
                 <h1 className="text-4xl md:text-5xl font-extrabold mb-4 hover:text-red-600">
-                  {posts[0].title}
+                  {posts[0]?.title ?? "Untitled"}
                 </h1>
               </Link>
-              {posts[0].image && (
+              {posts[0]?.image && (
                 <img
                   src={posts[0].image}
-                  alt={posts[0].title}
+                  alt={posts[0]?.title ?? "Post image"}
                   className="w-full h-[400px] object-cover rounded"
                 />
               )}
               <p className="mt-4 text-gray-600 dark:text-gray-300 text-lg">
-                {posts[0].content.slice(0, 200)}...
+                {posts[0]?.content?.slice(0, 200) ?? "No content available"}...
               </p>
             </div>
           )}
 
           <AdBlock />
 
+          {/* List of other posts */}
           {posts.slice(1).map(post => (
-            <div key={post._id} className="border-b pb-6">
-              <Link href={`/articles/${post._id}`}>
-                <h2 className="text-xl font-bold hover:text-red-600">{post.title}</h2>
+            <div key={post?._id ?? Math.random()} className="border-b pb-6">
+              <Link href={`/articles/${post?._id ?? "#"}`}>
+                <h2 className="text-xl font-bold hover:text-red-600">
+                  {post?.title ?? "Untitled"}
+                </h2>
               </Link>
               <p className="text-gray-600 dark:text-gray-400 text-sm mt-2">
-                {post.content.slice(0, 120)}...
+                {post?.content?.slice(0, 120) ?? "No content available"}...
               </p>
             </div>
           ))}
         </div>
 
         {/* Sidebar */}
-   <div className="space-y-6">
-  <TrendingSidebar />
-  <AdBlock />
-</div>
+        <div className="space-y-6">
+          <TrendingSidebar posts={posts} />
+          <AdBlock />
+        </div>
       </main>
 
       <Footer />
