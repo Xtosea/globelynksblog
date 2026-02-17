@@ -1,26 +1,25 @@
-import { dbConnect } from "@/lib/mongodb";
+// pages/api/articles/[identifier].js
+import { connectDB } from "@/lib/mongodb";
 import Article from "@/models/Article";
 
 export default async function handler(req, res) {
   const { identifier } = req.query;
 
-  await dbConnect();
+  try {
+    await connectDB(); // connect to MongoDB
 
-  let article = null;
+    // Fetch article by _id or slug
+    const article = await Article.findOne({
+      $or: [{ _id: identifier }, { slug: identifier }],
+    });
 
-  // If it's MongoDB ObjectId
-  if (/^[0-9a-fA-F]{24}$/.test(identifier)) {
-    article = await Article.findById(identifier);
+    if (!article) {
+      return res.status(404).json({ message: "Article not found" });
+    }
+
+    res.status(200).json(article);
+  } catch (err) {
+    console.error("Error fetching article:", err);
+    res.status(500).json({ message: "Internal Server Error" });
   }
-
-  // If not found, try slug
-  if (!article) {
-    article = await Article.findOne({ slug: identifier });
-  }
-
-  if (!article) {
-    return res.status(404).json({ message: "Not found" });
-  }
-
-  res.status(200).json(article);
 }
