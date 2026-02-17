@@ -1,62 +1,53 @@
-"use client"
+import { Html, Head, Main, NextScript } from "next/document";
 
-import { useEffect, useState } from "react"
-import Navbar from "../components/Navbar"
-import Footer from "../components/Footer"
-import BreakingTicker from "../components/BreakingTicker"
-import TrendingSidebar from "../components/TrendingSidebar"
-import AdBlock from "../components/AdBlock"
-import StickyShare from "../components/StickyShare"
-import Link from "next/link"
-
-export default function Home() {
-  const [posts, setPosts] = useState([])
-
-  useEffect(() => {
-    const fetchPosts = () => {
-      fetch("/api/posts")
-        .then(res => res.json())
-        .then(data => setPosts(data))
-        .catch(err => console.error(err))
-    }
-
-    fetchPosts()
-    const interval = setInterval(fetchPosts, 30000)
-    return () => clearInterval(interval)
-  }, [])
-
+export default function Document() {
   return (
-    <>
-      <Navbar />  
-      <BreakingTicker posts={posts} />
-      <StickyShare />
-      <main className="max-w-7xl mx-auto px-6 py-10 grid md:grid-cols-4 gap-10">
-        <div className="md:col-span-3 space-y-10">
-          {posts[0] && (
-            <div>
-              <Link href={`/posts/${posts[0].slug}`}>
-                <h1 className="text-4xl md:text-5xl font-extrabold mb-4 hover:text-red-600">{posts[0].title}</h1>
-              </Link>
-              {posts[0].image && <img src={posts[0].image} alt={posts[0].title} className="w-full h-[400px] object-cover rounded" />}
-              <p className="mt-4 text-gray-600 dark:text-gray-300 text-lg">{posts[0].excerpt}</p>
-            </div>
-          )}
-          <AdBlock />
-          {posts.slice(1).map(post => (
-            <div key={post._id} className="border-b pb-6">
-              <Link href={`/posts/${post.slug}`}>
-                <h2 className="text-xl font-bold hover:text-red-600">{post.title}</h2>
-              </Link>
-              <p className="text-gray-600 dark:text-gray-400 text-sm mt-2">{post.excerpt}</p>
-            </div>
-          ))}
-        </div>
-        <div className="space-y-6">
-          <TrendingSidebar posts={posts} />
-          <AdBlock />
-        </div>
-      </main>
-      <Footer />
-    </>
-  )
+    <Html>
+      <Head>
+        {/* Tailwind CDN with custom configuration */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              tailwind.config = {
+                theme: {
+                  extend: {
+                    colors: {
+                      accent1: '#fafafa',
+                      accent2: '#eaeaea',
+                      accent7: '#333',
+                      success: '#0070f3',
+                      cyan: '#79ffe1',
+                      blue500: '#2276fc',
+                      yellow100: '#fef7da',
+                    },
+                    fontSize: {
+                      '5xl': '2.5rem',
+                      '6xl': '2.75rem',
+                      '7xl': '4.5rem',
+                      '8xl': '6.25rem',
+                    },
+                    letterSpacing: {
+                      tighter: '-0.04em',
+                    },
+                    lineHeight: {
+                      tight: '1.2',
+                    },
+                    boxShadow: {
+                      small: '0 5px 10px rgba(0,0,0,0.12)',
+                      medium: '0 8px 30px rgba(0,0,0,0.12)',
+                    },
+                  },
+                },
+              }
+            `,
+          }}
+        ></script>
+        <script src="https://cdn.tailwindcss.com"></script>
+      </Head>
+      <body>
+        <Main />
+        <NextScript />
+      </body>
+    </Html>
+  );
 }
