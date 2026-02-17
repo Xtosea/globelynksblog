@@ -1,5 +1,5 @@
 // pages/api/seed-admin.js
-import dbConnect from "../../../lib/mongodb"; // adjust path if needed
+import { connectDB } from '@/lib/mongodb'; // adjust path if needed
 import User from "../../../models/User";
 import bcrypt from "bcryptjs";
 
