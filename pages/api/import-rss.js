@@ -1,5 +1,6 @@
+// /pages/api/import-rss.js
 import RSSParser from "rss-parser";
-import { connectDB } from "@/lib/mongodb"; // Make sure your connectDB is exported correctly
+import { connectDB } from "@/lib/mongodb"; // Make sure connectDB is exported correctly
 import Article from "@/models/Article";
 
 export default async function handler(req, res) {
@@ -8,12 +9,13 @@ export default async function handler(req, res) {
   }
 
   try {
-    await connectDB(); // Connect to MongoDB
+    // Connect to MongoDB
+    await connectDB();
     console.log("✅ MongoDB connected");
 
     const parser = new RSSParser();
 
-    // 🔴 Replace with a real RSS feed URL
+    // 🔴 Replace with your real RSS feed URL
     const RSS_URL = "https://feeds.bbci.co.uk/news/rss.xml";
 
     console.log("📡 Fetching RSS from:", RSS_URL);
@@ -35,8 +37,9 @@ export default async function handler(req, res) {
         category: item.categories?.[0] || "General",
         image: item.enclosure?.url || "",
         views: 0,
-        published: true, // Important so it shows in trending
+        published: true, // Important for trending API
         createdAt: item.pubDate ? new Date(item.pubDate) : new Date(),
+        source: item.link || "RSS Feed", // ✅ Required field fix
       });
 
       importedCount++;
@@ -51,8 +54,7 @@ export default async function handler(req, res) {
 
   } catch (error) {
     console.error("❌ RSS Import Error:", error);
-    // Return full error message for debugging
-    return res.status(500).json({ 
+    return res.status(500).json({
       error: "Failed to import RSS",
       details: error.message
     });
