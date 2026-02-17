@@ -15,16 +15,16 @@ export default function Home() {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        // 1️⃣ Fetch trending/breaking articles
+        // 1️⃣ Fetch trending/breaking articles (RSS)
         const trendingRes = await fetch("/api/articles/trending")
         const trendingData = await trendingRes.json()
         const trendingArticles = trendingData.topArticles || []
 
-        // 2️⃣ Fetch old posts
+        // 2️⃣ Fetch old posts from database
         const oldRes = await fetch("/api/posts")
         const oldPosts = await oldRes.json()
 
-        // 3️⃣ Merge and sort (newest first)
+        // 3️⃣ Merge arrays and sort by date (newest first)
         const mergedPosts = [...trendingArticles, ...oldPosts].sort(
           (a, b) =>
             new Date(b.scheduledDate ?? b.createdAt) -
@@ -42,6 +42,9 @@ export default function Home() {
     return () => clearInterval(interval)
   }, [])
 
+  // Helper to generate URL (prefer slug if available)
+  const getPostLink = (post) => post?.slug ? `/articles/${post.slug}` : `/articles/${post._id}`
+
   return (
     <>
       <Navbar />
@@ -54,20 +57,20 @@ export default function Home() {
           {/* Featured post */}
           {posts[0] && (
             <div>
-              <Link href={`/articles/${posts[0]?._id ?? "#"}`}>
+              <Link href={getPostLink(posts[0])}>
                 <h1 className="text-4xl md:text-5xl font-extrabold mb-4 hover:text-red-600">
-                  {posts[0]?.title ?? "Untitled"}
+                  {posts[0].title ?? "Untitled"}
                 </h1>
               </Link>
-              {posts[0]?.image && (
+              {posts[0].image && (
                 <img
                   src={posts[0].image}
-                  alt={posts[0]?.title ?? "Post image"}
+                  alt={posts[0].title ?? "Post image"}
                   className="w-full h-[400px] object-cover rounded"
                 />
               )}
               <p className="mt-4 text-gray-600 dark:text-gray-300 text-lg">
-                {posts[0]?.content?.slice(0, 200) ?? "No content available"}...
+                {posts[0].content?.slice(0, 200) ?? "No content available"}...
               </p>
             </div>
           )}
@@ -76,14 +79,14 @@ export default function Home() {
 
           {/* List of other posts */}
           {posts.slice(1).map(post => (
-            <div key={post?._id ?? Math.random()} className="border-b pb-6">
-              <Link href={`/articles/${post?._id ?? "#"}`}>
+            <div key={post._id ?? Math.random()} className="border-b pb-6">
+              <Link href={getPostLink(post)}>
                 <h2 className="text-xl font-bold hover:text-red-600">
-                  {post?.title ?? "Untitled"}
+                  {post.title ?? "Untitled"}
                 </h2>
               </Link>
               <p className="text-gray-600 dark:text-gray-400 text-sm mt-2">
-                {post?.content?.slice(0, 120) ?? "No content available"}...
+                {post.content?.slice(0, 120) ?? "No content available"}...
               </p>
             </div>
           ))}
