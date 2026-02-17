@@ -83,10 +83,10 @@ export default function Home() {
         </div>
 
         {/* Sidebar */}
-        <div className="space-y-6">
-          <TrendingSidebar posts={posts} />
-          <AdBlock />
-        </div>
+   <div className="space-y-6">
+  <TrendingSidebar />
+  <AdBlock />
+</div>
       </main>
 
       <Footer />
