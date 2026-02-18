@@ -20,7 +20,7 @@ export default function Home() {
         const trendingData = await trendingRes.json()
         const trendingArticles = trendingData.topArticles || []
 
-        // 2️⃣ Fetch old posts from database
+        // 2️⃣ Fetch old/internal posts
         const oldRes = await fetch("/api/posts")
         const oldPosts = await oldRes.json()
 
@@ -42,8 +42,17 @@ export default function Home() {
     return () => clearInterval(interval)
   }, [])
 
-  // Helper to generate URL (prefer slug if available)
-  const getPostLink = (post) => post?.slug ? `/articles/${post.slug}` : `/articles/${post._id}`
+  // Helper to generate URL
+  const getPostLink = (post) =>
+    post?.originalUrl
+      ? post.originalUrl // external RSS article
+      : post?.slug
+      ? `/articles/${post.slug}` // internal post with slug
+      : `/articles/${post._id}` // fallback
+
+  // Helper to open external links in new tab
+  const getLinkProps = (post) =>
+    post?.originalUrl ? { target: "_blank", rel: "noopener noreferrer" } : {}
 
   return (
     <>
@@ -57,7 +66,7 @@ export default function Home() {
           {/* Featured post */}
           {posts[0] && (
             <div>
-              <Link href={getPostLink(posts[0])}>
+              <Link href={getPostLink(posts[0])} {...getLinkProps(posts[0])}>
                 <h1 className="text-4xl md:text-5xl font-extrabold mb-4 hover:text-red-600">
                   {posts[0].title ?? "Untitled"}
                 </h1>
@@ -72,15 +81,20 @@ export default function Home() {
               <p className="mt-4 text-gray-600 dark:text-gray-300 text-lg">
                 {posts[0].content?.slice(0, 200) ?? "No content available"}...
               </p>
+              {posts[0].source && (
+                <p className="text-gray-400 text-sm mt-1">
+                  Source: {posts[0].source}
+                </p>
+              )}
             </div>
           )}
 
           <AdBlock />
 
           {/* List of other posts */}
-          {posts.slice(1).map(post => (
+          {posts.slice(1).map((post) => (
             <div key={post._id ?? Math.random()} className="border-b pb-6">
-              <Link href={getPostLink(post)}>
+              <Link href={getPostLink(post)} {...getLinkProps(post)}>
                 <h2 className="text-xl font-bold hover:text-red-600">
                   {post.title ?? "Untitled"}
                 </h2>
@@ -88,6 +102,9 @@ export default function Home() {
               <p className="text-gray-600 dark:text-gray-400 text-sm mt-2">
                 {post.content?.slice(0, 120) ?? "No content available"}...
               </p>
+              {post.source && (
+                <p className="text-gray-400 text-xs mt-1">Source: {post.source}</p>
+              )}
             </div>
           ))}
         </div>
