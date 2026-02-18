@@ -44,7 +44,7 @@ export default function Home() {
 
   // Helper to generate URL
 const getPostLink = (post) => {
-  return post.originalUrl || `/articles/${post.slug || post._id}`;
+  return post.originalUrl || `/posts/${post.slug || post._id}`;
 };
 
   // Helper to open external links in new tab
