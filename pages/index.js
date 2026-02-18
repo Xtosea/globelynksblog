@@ -22,28 +22,35 @@ export default function Home() {
         const oldRes = await fetch("/api/posts")
         const oldPosts = await oldRes.json()
 
-        const sortedTrending = trendingArticles.sort(
+        // 🔥 Merge and globally sort by newest date
+        const mergedPosts = [...trendingArticles, ...oldPosts].sort(
           (a, b) =>
-            new Date(b.pubDate ?? b.createdAt) -
-            new Date(a.pubDate ?? a.createdAt)
+            new Date(
+              b.pubDate || b.scheduledDate || b.createdAt || 0
+            ) -
+            new Date(
+              a.pubDate || a.scheduledDate || a.createdAt || 0
+            )
         )
 
-        const sortedOld = oldPosts.sort(
-          (a, b) =>
-            new Date(b.scheduledDate ?? b.createdAt) -
-            new Date(a.scheduledDate ?? a.createdAt)
+        // 🔥 Remove duplicates (by URL or _id)
+        const uniquePosts = mergedPosts.filter(
+          (post, index, self) =>
+            index ===
+            self.findIndex(
+              (p) =>
+                p.originalUrl === post.originalUrl ||
+                p._id === post._id
+            )
         )
 
-        const mergedPosts = [...sortedTrending, ...sortedOld]
-
-        setPosts(mergedPosts) // ✅ IMPORTANT
+        setPosts(uniquePosts)
       } catch (error) {
         console.error("Error fetching posts:", error)
       }
     }
 
     fetchPosts()
-
     const interval = setInterval(fetchPosts, 30000)
     return () => clearInterval(interval)
   }, [])
@@ -65,6 +72,8 @@ export default function Home() {
 
       <main className="max-w-7xl mx-auto px-6 py-10 grid md:grid-cols-4 gap-10">
         <div className="md:col-span-3 space-y-10">
+
+          {/* Featured Post */}
           {posts[0] && (
             <div>
               <Link href={getPostLink(posts[0])} {...getLinkProps(posts[0])}>
@@ -78,6 +87,7 @@ export default function Home() {
                   src={posts[0].image}
                   alt={posts[0].title}
                   className="w-full h-[400px] object-cover rounded"
+                  loading="lazy"
                 />
               )}
 
@@ -95,26 +105,38 @@ export default function Home() {
 
           <AdBlock />
 
+          {/* Post List */}
           {posts.slice(1).map((post) => (
             <div
               key={post._id || post.originalUrl}
-              className="border-b pb-6"
+              className="border-b pb-6 flex gap-4"
             >
-              <Link href={getPostLink(post)} {...getLinkProps(post)}>
-                <h2 className="text-xl font-bold hover:text-red-600">
-                  {post.title}
-                </h2>
-              </Link>
-
-              <p className="text-gray-600 dark:text-gray-400 text-sm mt-2">
-                {post.content?.slice(0, 120)}...
-              </p>
-
-              {post.source && (
-                <p className="text-gray-400 text-xs mt-1">
-                  Source: {post.source}
-                </p>
+              {post.image && (
+                <img
+                  src={post.image}
+                  alt={post.title}
+                  className="w-32 h-24 object-cover rounded"
+                  loading="lazy"
+                />
               )}
+
+              <div>
+                <Link href={getPostLink(post)} {...getLinkProps(post)}>
+                  <h2 className="text-xl font-bold hover:text-red-600">
+                    {post.title}
+                  </h2>
+                </Link>
+
+                <p className="text-gray-600 dark:text-gray-400 text-sm mt-2">
+                  {post.content?.slice(0, 120)}...
+                </p>
+
+                {post.source && (
+                  <p className="text-gray-400 text-xs mt-1">
+                    Source: {post.source}
+                  </p>
+                )}
+              </div>
             </div>
           ))}
         </div>
