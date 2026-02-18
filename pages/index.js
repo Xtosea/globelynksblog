@@ -43,12 +43,13 @@ export default function Home() {
   }, [])
 
   // Helper to generate URL
-  const getPostLink = (post) =>
-    post?.originalUrl
-      ? post.originalUrl // external RSS article
-      : post?.slug
-      ? `/articles/${post.slug}` // internal post with slug
-      : `/articles/${post._id}` // fallback
+  const getPostLink = (post) => {
+  if (post.type === "rss") {
+    return post.originalUrl; // direct external link
+  }
+
+  return `/articles/${post.slug || post._id}`;
+};
 
   // Helper to open external links in new tab
   const getLinkProps = (post) =>
