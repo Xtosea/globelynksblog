@@ -1,62 +1,58 @@
 // /pages/api/import-rss.js
 import RSSParser from "rss-parser";
-import { connectDB } from "@/lib/mongodb"; // Make sure connectDB is exported correctly
+import { connectDB } from "@/lib/mongodb";
 import Article from "@/models/Article";
 
+const RSS_FEEDS = [
+  { url: "https://techcrunch.com/feed/", source: "TechCrunch" },
+  { url: "http://feeds.bbci.co.uk/news/rss.xml", source: "BBC News" },
+  { url: "http://rss.cnn.com/rss/edition.rss", source: "CNN" },
+];
+
 export default async function handler(req, res) {
-  if (req.method !== "GET") {
-    return res.status(405).json({ message: "Method not allowed" });
+  if (req.method !== "POST") {
+    return res.status(405).json({ message: "Method not allowed. Use POST." });
   }
 
   try {
-    // Connect to MongoDB
     await connectDB();
-    console.log("✅ MongoDB connected");
+    const importedArticles = [];
 
     const parser = new RSSParser();
 
-    // 🔴 Replace with your real RSS feed URL
-    const RSS_URL = "https://feeds.bbci.co.uk/news/rss.xml";
+    for (const feed of RSS_FEEDS) {
+      console.log("Fetching feed:", feed.url);
+      const rss = await parser.parseURL(feed.url);
 
-    console.log("📡 Fetching RSS from:", RSS_URL);
-    const feed = await parser.parseURL(RSS_URL);
+      for (const item of rss.items) {
+        // Skip duplicates by title
+        const exists = await Article.findOne({ title: item.title });
+        if (exists) continue;
 
-    console.log("📰 Feed title:", feed.title);
-    console.log("🧾 Number of items in feed:", feed.items.length);
+        const article = await Article.create({
+          title: item.title,
+          content: item.content || item.contentSnippet || "",
+          category: item.categories?.[0] || "General",
+          image: item.enclosure?.url || "",
+          views: 0,
+          published: true,
+          createdAt: item.pubDate ? new Date(item.pubDate) : new Date(),
+          source: feed.source,
+          originalUrl: item.link || "",
+        });
 
-    let importedCount = 0;
-
-    for (const item of feed.items) {
-      // Skip duplicates by title
-      const exists = await Article.findOne({ title: item.title });
-      if (exists) continue;
-
-      await Article.create({
-        title: item.title,
-        content: item.content || item.contentSnippet || "",
-        category: item.categories?.[0] || "General",
-        image: item.enclosure?.url || "",
-        views: 0,
-        published: true, // Important for trending API
-        createdAt: item.pubDate ? new Date(item.pubDate) : new Date(),
-        source: item.link || "RSS Feed", // ✅ Required field fix
-      });
-
-      importedCount++;
-      console.log("✅ Imported:", item.title);
+        importedArticles.push(article.title);
+        console.log(`Imported: ${item.title} from ${feed.source}`);
+      }
     }
 
     return res.status(200).json({
-      success: true,
-      imported: importedCount,
-      totalFeedItems: feed.items.length,
+      message: "RSS import complete!",
+      imported: importedArticles.length,
+      titles: importedArticles,
     });
-
-  } catch (error) {
-    console.error("❌ RSS Import Error:", error);
-    return res.status(500).json({
-      error: "Failed to import RSS",
-      details: error.message
-    });
+  } catch (err) {
+    console.error("RSS import error:", err);
+    return res.status(500).json({ message: "Error importing RSS feeds", error: err.message });
   }
 }
