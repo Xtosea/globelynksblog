@@ -4,6 +4,11 @@ const ArticleSchema = new mongoose.Schema({
   title: { type: String, required: true, unique: true },
   content: { type: String, required: true },
   source: { type: String, required: true },
+
+  originalUrl: { type: String },   // ✅ ADD THIS
+  image: { type: String },         // ✅ optional but useful
+  slug: { type: String, unique: true }, // ✅ optional for SEO
+
   category: { type: String, default: "General" },
   tags: { type: [String], default: [] },
   scheduledDate: { type: Date, default: Date.now },
