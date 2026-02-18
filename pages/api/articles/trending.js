@@ -1,23 +1,45 @@
 import { connectDB } from '@/lib/mongodb';
 import Article from "@/models/Article";
 
+import Parser from "rss-parser"
+
 export default async function handler(req, res) {
   try {
-    await connectDB();  // <-- use connectDB, not dbConnect
+    const parser = new Parser({
+      customFields: {
+        item: [
+          ["media:content", "mediaContent"],
+          ["media:thumbnail", "mediaThumbnail"],
+          ["content:encoded", "contentEncoded"]
+        ]
+      }
+    })
 
-    const topArticles = await Article.find({ published: true })
-      .sort({ views: -1 })
-      .limit(10);
+    const feed = await parser.parseURL("YOUR_RSS_FEED_URL")
 
-    const categoryCount = await Article.aggregate([
-      { $match: { published: true } },
-      { $group: { _id: "$category", count: { $sum: 1 } } },
-      { $sort: { count: -1 } }
-    ]);
+    const topArticles = feed.items.map((item) => ({
+      title: item.title,
+      content:
+        item.contentSnippet ||
+        item.contentEncoded ||
+        item.content ||
+        "",
+      originalUrl: item.link,
+      source: feed.title,
+      pubDate: item.pubDate,
 
-    res.status(200).json({ topArticles, categoryCount });
+      // 🔥 IMAGE EXTRACTION FIX
+      image:
+        item.enclosure?.url ||
+        item.mediaContent?.url ||
+        item.mediaThumbnail?.url ||
+        (item.contentEncoded?.match(/<img.*?src="(.*?)"/)?.[1]) ||
+        null
+    }))
+
+    res.status(200).json({ topArticles })
   } catch (err) {
-    console.error("Error fetching trending articles:", err);
-    res.status(500).json({ error: "Failed to fetch trending articles" });
+    console.error("RSS fetch error:", err)
+    res.status(500).json({ error: "Failed to fetch RSS feed" })
   }
 }
