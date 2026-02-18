@@ -28,7 +28,7 @@ export default async function handler(req, res) {
       source: feed.title,
       pubDate: item.pubDate,
 
-      // 🔥 IMAGE EXTRACTION FIX
+      // 🔥 Robust image extraction
       image:
         item.enclosure?.url ||
         item.mediaContent?.url ||
