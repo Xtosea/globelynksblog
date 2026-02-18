@@ -19,46 +19,26 @@ export default function Home() {
         const trendingData = await trendingRes.json()
         const trendingArticles = trendingData.topArticles || []
 
-        const oldRes = await fetch("/api/posts")
-        const oldPosts = await oldRes.json()
-
-        // 🔥 Merge and globally sort by newest date
-        const mergedPosts = [...trendingArticles, ...oldPosts].sort(
-          (a, b) =>
-            new Date(
-              b.pubDate || b.scheduledDate || b.createdAt || 0
-            ) -
-            new Date(
-              a.pubDate || a.scheduledDate || a.createdAt || 0
-            )
+        // Sort by createdAt to ensure newest articles on top
+        const sortedPosts = trendingArticles.sort(
+          (a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
         )
 
-        // 🔥 Remove duplicates (by URL or _id)
-        const uniquePosts = mergedPosts.filter(
-          (post, index, self) =>
-            index ===
-            self.findIndex(
-              (p) =>
-                p.originalUrl === post.originalUrl ||
-                p._id === post._id
-            )
-        )
-
-        setPosts(uniquePosts)
+        setPosts(sortedPosts)
       } catch (error) {
         console.error("Error fetching posts:", error)
       }
     }
 
     fetchPosts()
-    const interval = setInterval(fetchPosts, 30000)
+    const interval = setInterval(fetchPosts, 30000) // refresh every 30s
     return () => clearInterval(interval)
   }, [])
 
-  const getPostLink = (post) => {
-    return post.originalUrl || `/posts/${post.slug || post._id}`
-  }
+  // Return original URL for RSS posts or internal post link
+  const getPostLink = (post) => post.originalUrl || `/posts/${post.slug || post._id}`
 
+  // Open external RSS links in new tab
   const getLinkProps = (post) =>
     post?.originalUrl
       ? { target: "_blank", rel: "noopener noreferrer" }
@@ -71,8 +51,8 @@ export default function Home() {
       <StickyShare />
 
       <main className="max-w-7xl mx-auto px-6 py-10 grid md:grid-cols-4 gap-10">
+        {/* Main Content */}
         <div className="md:col-span-3 space-y-10">
-
           {/* Featured Post */}
           {posts[0] && (
             <div>
@@ -105,7 +85,7 @@ export default function Home() {
 
           <AdBlock />
 
-          {/* Post List */}
+          {/* List of other posts */}
           {posts.slice(1).map((post) => (
             <div
               key={post._id || post.originalUrl}
@@ -141,6 +121,7 @@ export default function Home() {
           ))}
         </div>
 
+        {/* Sidebar */}
         <div className="space-y-6">
           <TrendingSidebar posts={posts} />
           <AdBlock />
