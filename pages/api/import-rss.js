@@ -16,28 +16,34 @@ export default async function handler(req, res) {
   try {
     await connectDB();
     const parser = new RSSParser();
+
     let importedCount = 0;
-    const importedArticles = []; // store imported articles to return
+    const importedArticles = [];
 
     for (const feedInfo of RSS_FEEDS) {
       console.log(`Fetching feed: ${feedInfo.url}`);
+
       try {
         const feed = await parser.parseURL(feedInfo.url);
 
         for (const item of feed.items) {
+          // Avoid duplicates
           const exists = await Article.findOne({ title: item.title });
           if (exists) continue;
 
           const newArticle = await Article.create({
             title: item.title,
             content: item.content || item.contentSnippet || "",
+            type: "rss", // 🔥 VERY IMPORTANT FIX
             category: item.categories?.[0] || "General",
             image: item.enclosure?.url || "",
             source: feedInfo.source,
             originalUrl: item.link || "",
             views: 0,
             published: true,
-            createdAt: item.pubDate ? new Date(item.pubDate) : new Date(),
+            createdAt: item.pubDate
+              ? new Date(item.pubDate)
+              : new Date(),
           });
 
           importedArticles.push({
@@ -54,13 +60,17 @@ export default async function handler(req, res) {
       }
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "RSS import complete",
       imported: importedCount,
-      articles: importedArticles, // <-- return articles with original URLs
+      articles: importedArticles,
     });
+
   } catch (err) {
     console.error("Error in RSS import API:", err);
-    res.status(500).json({ message: "Server error", error: err.message });
+    return res.status(500).json({
+      message: "Server error",
+      error: err.message,
+    });
   }
 }
