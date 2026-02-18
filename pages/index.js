@@ -1,6 +1,3 @@
-"use client"
-
-import { useEffect, useState } from "react"
 import Navbar from "../components/Navbar"
 import Footer from "../components/Footer"
 import BreakingTicker from "../components/BreakingTicker"
@@ -8,37 +5,25 @@ import TrendingSidebar from "../components/TrendingSidebar"
 import AdBlock from "../components/AdBlock"
 import StickyShare from "../components/StickyShare"
 import Link from "next/link"
+import Image from "next/image"
 
-export default function Home() {
-  const [posts, setPosts] = useState([])
+import { connectDB } from "@/lib/mongodb"
+import Article from "@/models/Article"
 
-  useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const trendingRes = await fetch("/api/articles/trending")
-        const trendingData = await trendingRes.json()
-        const trendingArticles = trendingData.topArticles || []
+export const revalidate = 3600 // Cache page for 1 hour
 
-        // Sort by createdAt to ensure newest articles on top
-        const sortedPosts = trendingArticles.sort(
-          (a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
-        )
+export default async function Home() {
+  await connectDB()
 
-        setPosts(sortedPosts)
-      } catch (error) {
-        console.error("Error fetching posts:", error)
-      }
-    }
+  const posts = await Article.find()
+    .sort({ createdAt: -1 })
+    .limit(20)
+    .select("title slug image createdAt content source originalUrl")
+    .lean()
 
-    fetchPosts()
-    const interval = setInterval(fetchPosts, 30000) // refresh every 30s
-    return () => clearInterval(interval)
-  }, [])
+  const getPostLink = (post) =>
+    post.originalUrl || `/posts/${post.slug || post._id}`
 
-  // Return original URL for RSS posts or internal post link
-  const getPostLink = (post) => post.originalUrl || `/posts/${post.slug || post._id}`
-
-  // Open external RSS links in new tab
   const getLinkProps = (post) =>
     post?.originalUrl
       ? { target: "_blank", rel: "noopener noreferrer" }
@@ -63,11 +48,13 @@ export default function Home() {
               </Link>
 
               {posts[0].image && (
-                <img
+                <Image
                   src={posts[0].image}
                   alt={posts[0].title}
+                  width={1200}
+                  height={600}
                   className="w-full h-[400px] object-cover rounded"
-                  loading="lazy"
+                  priority
                 />
               )}
 
@@ -85,18 +72,19 @@ export default function Home() {
 
           <AdBlock />
 
-          {/* List of other posts */}
+          {/* Other Posts */}
           {posts.slice(1).map((post) => (
             <div
               key={post._id || post.originalUrl}
               className="border-b pb-6 flex gap-4"
             >
               {post.image && (
-                <img
+                <Image
                   src={post.image}
                   alt={post.title}
+                  width={200}
+                  height={150}
                   className="w-32 h-24 object-cover rounded"
-                  loading="lazy"
                 />
               )}
 
