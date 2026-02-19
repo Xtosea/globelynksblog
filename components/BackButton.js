@@ -1,24 +1,23 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 export default function BackButton() {
   const router = useRouter();
+  const pathname = usePathname();
+
+  if (pathname === "/") return null; // hide on homepage
+
+  const handleBack = () => {
+    if (window.history.length > 1) {
+      router.back();
+    } else {
+      router.push("/");
+    }
+  };
 
   return (
-    <button
-      onClick={() => router.back()}
-      style={{
-        padding: "8px 14px",
-        marginBottom: "15px",
-        background: "#111",
-        color: "#fff",
-        border: "none",
-        borderRadius: "6px",
-        cursor: "pointer",
-        fontSize: "14px"
-      }}
-    >
+    <button onClick={handleBack} className="back-btn">
       ← Go Back
     </button>
   );
