@@ -1,8 +1,0 @@
-{
-  "crons": [
-    {
-      "path": "/api/import-rss",
-      "schedule": "0 0 * * *"
-    }
-  ]
-}
