@@ -7,8 +7,6 @@ import StickyShare from "../components/StickyShare"
 import Link from "next/link"
 import Image from "next/image"
 
-import { connectDB } from "@/lib/mongodb"
-import Article from "@/models/Article"
 
 export const revalidate = 3600 // Cache page for 1 hour
 
